@@ -11,7 +11,9 @@ function tp_manage_post_table_header( $defaults ) {
 	unset( $defaults['comments'], $defaults['author'] );
 //	$defaults['tp_updated'] = __( 'Updated', 'tppi' );
 	$defaults['tp_price'] = __( 'Price', 'tppi' );
-	$defaults = array_merge( array_splice( $defaults, 0, 1 ), array( 'tp_thumbnail' => __( 'Thumbnail', 'tppi' ) ), $defaults );
+	if ( function_exists( 'get_the_post_thumbnail' ) ) {
+		$defaults = array_merge( array_splice( $defaults, 0, 1 ), array( 'tp_thumbnail' => __( 'Thumbnail', 'tppi' ) ), $defaults );
+	}
 	return $defaults;
 }
 

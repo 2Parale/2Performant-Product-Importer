@@ -1,4 +1,6 @@
 <?php
+$pear_dir = WP_PLUGIN_DIR . '/' . str_replace( basename( __FILE__ ), '', plugin_basename( __FILE__ ) ) . 'api';
+set_include_path( get_include_path() . PATH_SEPARATOR . $pear_dir . PATH_SEPARATOR . $pear_dir . '/PEAR' );
 include_once 'api/2performant.php';
 
 function tp_get_wrapper() {

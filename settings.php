@@ -114,6 +114,10 @@ function tp_render_field( $setting ) {
 
 function tp_render_post_type_select( $setting ) {
 	extract( $setting );
+	$type = empty( $type ) ? 'text' : $type;
+	$class = isset( $class ) ? $class : array();
+	$class = is_array( $class ) ? $class : array ( $class );
+	
 	if ( isset( $options ) && is_array( $options ) ) {
 		foreach ( $options as $option ) {
 			$selected = $option->name == $value ? 'selected="selected"' : '';
