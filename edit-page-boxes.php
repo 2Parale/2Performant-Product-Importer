@@ -5,6 +5,12 @@ if ( is_admin() ) :
 add_action( 'add_meta_boxes', 'tp_add_product_box' );
 
 function tp_add_product_box() {
+	global $post;
+	
+	// Check if it's a product
+	if ( ! get_post_meta( $post->ID, 'tp_product_info', true ) )
+		return false;
+
 	$post_type = tp_get_post_type();
 	add_meta_box( 'tp_product_info', __( '2Performant Product Information', 'tppi' ), 'tp_product_info_inner_boxes', $post_type, 'normal', 'high' );
 	
@@ -90,6 +96,10 @@ function tp_save_productdata( $post_id ) {
 
 	// Check permissions
 	if ( ! current_user_can( 'edit_post', $post_id ) )
+		return $post_id;
+	
+	// Check if it's a product
+	if ( ! get_post_meta( $post_id, 'tp_product_info', true ) )
 		return $post_id;
 
 	// OK, we're authenticated: we need to find and save the data

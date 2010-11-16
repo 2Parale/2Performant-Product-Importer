@@ -108,7 +108,15 @@ class TP_AJAX_wrapper {
 		));
 		foreach ( $prods as $k => $v ) {
 			$t = get_post_meta( $v->ID, 'tp_product_info', true );
-			if ( $t !== '' )
+			$ok = false;
+			if( is_array( $t ) ) {
+				foreach ( $t as $kk => $vv ) {
+					if ( ! ( is_array($vv) || empty($vv) ) ) {
+						$ok = true;
+					}
+				}
+			}
+			if ( $t && $t !== '' && $ok )
 				$prods[$k] = $v->ID;
 			else
 				unset($prods[$k]);

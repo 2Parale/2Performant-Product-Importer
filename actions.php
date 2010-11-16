@@ -218,7 +218,7 @@ function tp_set_post_meta( $id, $pinfo, $preserve = false ) {
 	}
 	update_post_meta( $id, 'tp_product_info', $vars );
 	
-	$custom_fields = $meta['other_fields'];
+	$custom_fields = isset( $meta['other_fields'] ) ? $meta['other_fields'] : array();
 	foreach ( $custom_fields as $name => $o ) {
 		$oldmeta = get_post_meta( $id, $name, true );
 		if ( $preserve && $oldmeta && $oldmeta != tp_strtopinfo( $o['value'], $oldinfo ) ) {

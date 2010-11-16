@@ -1,6 +1,6 @@
 <?php
 
-$dir = dirname(__FILE__);
+$dir = str_replace( '\\', '/', dirname(__FILE__) );
 $pos = strpos( $dir, 'wp-content/plugins');
 $dir = substr( $dir, 0, $pos );
 
@@ -177,3 +177,4 @@ do_action('admin_head');
 	include(ABSPATH . 'wp-admin/admin-footer.php');
 
 //}
+//*/

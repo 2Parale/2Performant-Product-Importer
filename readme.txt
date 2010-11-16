@@ -1,7 +1,7 @@
 === 2Performant Product Importer ===
 Contributors: 2parale, tetele
 Donate link: 
-Tags: affiliate, posts
+Tags: affiliate, posts, commerce, products
 Requires at least: 3.0
 Tested up to: 3.0.1
 Stable tag: 0.9
@@ -26,8 +26,10 @@ Note that you have to embed this information in your theme manually using the `t
 == Frequently Asked Questions ==
 
 = I have installed the plugin, added a product from a feed, but it doesn't show up on my website. Why? =
-
 You have to manually display the product fields using the `tp_the_product_field( $key )` method.
+
+= Whoa! That product snippet looks totally awkward on my blog. You call that looking good? =
+Actually, no. But there's a reason for it: you can do your own styling depending on your theme and imagination. Just add some CSS for the mentioned classes and you should be OK.
 
 == Screenshots ==
 
@@ -38,7 +40,8 @@ You have to manually display the product fields using the `tp_the_product_field(
 = 0.9.1 =
 * **New Feature** Introduced ability to insert product info dirrectly into post content using the WYSIWYG editor (see *Insert 2Performant Product* button) and shortcode
 * **Bugfix** Product update for drafts/pending products
-* **Bugfix** Campaigns now sorted by name 
+* **Bugfix** Campaigns now sorted by name
+* **Bugfix** Does not delete regular posts on update
 
 = 0.9 =
 * Initial version.
@@ -46,7 +49,7 @@ You have to manually display the product fields using the `tp_the_product_field(
 == Upgrade Notice ==
 
 = 0.9.1 =
-Fixes a fatal error shown on environments without required PEAR classes
+Fixes a fatal error shown on environments without required PEAR classes. Introduces ability to insert product into post.
 
 = 0.9 =
 This version is the first version
