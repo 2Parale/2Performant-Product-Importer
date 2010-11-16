@@ -38,7 +38,7 @@ function tp_add_product_from_feed( $id, $feed, $category = array() ) {
 		
 		$pt = ($pt == 'post') ? '' : "post_type=$pt&";
 		
-		$existing = get_posts("{$pt}meta_key=tp_product_ID&meta_value=$id");
+		$existing = get_posts("{$pt}meta_key=tp_product_ID&meta_value=$id&post_status=publish,draft,pending");
 		if(!empty($existing)) {
 			$post['ID'] = array_pop($existing)->ID;
 			unset( $post['post_status'] );

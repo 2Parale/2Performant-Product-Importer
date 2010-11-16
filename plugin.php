@@ -13,7 +13,7 @@ License: GPL2
 //error_reporting(E_ALL);
 //define('SCRIPT_DEBUG', true);
 
-define('TPPI_VERSION', 'v0.9');
+define('TPPI_VERSION', 'v0.9.1a');
 
 if ( is_admin() ) :
 
@@ -42,11 +42,13 @@ function tp_plugin_menu() {
 	wp_register_style( 'jquery-ui-redmond', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/css/redmond/jquery-ui-1.8.5.custom.css' );
 	wp_register_script( 'jquery-infinitescroll', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/jquery.infinitescroll.js', array('jquery'), 'v1.5', true );
 	wp_register_script( 'jquery-ui-progressbar', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/jquery-ui-1.8.5.progressbar.min.js', array( 'jquery' ), 'v1.8.5', true );
+	wp_register_script( 'tp-jquery-product-list', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/jquery.productlist.js', array( 'jquery', 'jquery-infinitescroll' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-settings-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/settings.js', array( 'jquery' ), TPPI_VERSION, true );
-	wp_register_script( 'tp-feed-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/feed.js', array( 'jquery', 'jquery-infinitescroll', 'wp-lists' ), TPPI_VERSION, true );
+	wp_register_script( 'tp-feed-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/feed.js', array( 'jquery', 'tp-jquery-product-list', 'wp-lists' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-edit-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/edit.js', array( 'jquery' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-listing-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/listing.js', array( 'jquery' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-toolbox-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/toolbox.js', array( 'jquery', 'jquery-ui-progressbar' ), TPPI_VERSION, true );
+	wp_register_script( 'tp-tinymce-insert-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/tinymce-insert/js/insert.js', array( 'jquery', 'tp-jquery-product-list' ), TPPI_VERSION );
 }
 
 function tp_add_settings_script() {
@@ -92,11 +94,54 @@ function tp_the_product_field( $key ) {
 	echo tp_get_the_product_field( $key );
 }
 
+// [tp_product id="id" feed="feed"]
+function tp_product_shortcode( $atts ) {
+	extract( shortcode_atts( array (
+		'id' => false,
+		'feed' => false,
+	), $atts ) );
+	
+	if( ! ( is_numeric( $id ) && is_numeric( $feed ) ) )
+		return false;
+	
+	require_once( 'api.php' );
+	
+	$html = '';
+	$pinfo = tp_get_wrapper()->product_store_showitem( $feed, $id );
+	
+	if( empty( $pinfo ) )
+		return false;
+	ob_start();
+?>
+	<div class="tp-product-info">
+<?php if( isset($pinfo->{'image-url'} ) ) : ?>
+		<div class="tp-product-thumbnail">
+			<a href="<?php echo esc_attr( $pinfo->aff_link ); ?>">
+				<img src="<?php echo esc_attr( $pinfo->{'image-url'} ); ?>" />
+			</a>
+		</div>
+<?php endif; ?>
+		<div class="tp-product-meta">
+			<span class="tp-product-brand"><?php echo esc_attr( $pinfo->brand ); ?></span>
+			<span class="tp-product-title"><?php echo esc_attr( $pinfo->title ); ?></span>
+			<span class="tp-product-price"><?php echo esc_attr( $pinfo->price ); ?></span>
+		</div>
+	</div>
+<?php
+	$html = ob_get_contents();
+	
+	ob_end_clean();
+
+	return $html;
+}
+add_shortcode( 'tp_product', 'tp_product_shortcode' );
+
 include_once 'actions.php';
 include_once 'settings.php';
 include_once 'edit-page-boxes.php';
 include_once 'add-from-feed.php';
 include_once 'toolbox.php';
 include_once 'listing.php';
+include_once 'edit-page-button.php';
 
 ?>

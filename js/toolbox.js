@@ -1,4 +1,15 @@
 (function($){
+	function getObjectLength(obj) {
+		var count = 0;
+		
+		for(var prop in obj) {
+			if(obj.hasOwnProperty(prop))
+				++count;
+		}
+		
+		return count;
+	}
+	
 	$.fn.extend({
 		tpLoggingBox: function(_settings){
 			var defaults = {
@@ -94,6 +105,7 @@
 					}
 					
 					$.tpUpdateInfo.products = r.response.ids;
+					$.tpUpdateInfo.products.length = getObjectLength($.tpUpdateInfo.products);
 					$.tpUpdateInfo.processedProducts = 0;
 					$.tpUpdateInfo.successfullyProcessedProducts = 0;
 					
@@ -112,6 +124,8 @@
 					);
 					
 					for(k in $.tpUpdateInfo.products) {
+						if(k == 'length')
+							continue;
 						var pid = $.tpUpdateInfo.products[k];
 						$.tpPost(
 							'updateProduct',
@@ -172,6 +186,7 @@
 					console.log($('#tp_toolbox_deletecampaign_force:checked').size(), force);
 					
 					$.tpDelCampInfo.products = r.response.ids;
+					$.tpDelCampInfo.products.length = getObjectLength($.tpDelCampInfo.products);
 					$.tpDelCampInfo.processedProducts = 0;
 					$.tpDelCampInfo.successfullyProcessedProducts = 0;
 					
@@ -195,6 +210,8 @@
 					);
 					
 					for(k in $.tpDelCampInfo.products) {
+						if(k == 'length')
+							continue;
 						var pid = $.tpDelCampInfo.products[k];
 						$.tpPost(
 							'deleteProduct',

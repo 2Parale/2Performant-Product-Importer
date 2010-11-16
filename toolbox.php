@@ -103,6 +103,7 @@ class TP_AJAX_wrapper {
 	protected static function getProducts() {
 		$prods = get_posts( array(
 			'type' => tp_get_post_type(),
+			'post_status' => array( 'publish', 'draft', 'pending' ),
 			'numberposts' => -1,
 		));
 		foreach ( $prods as $k => $v ) {

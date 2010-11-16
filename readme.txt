@@ -4,7 +4,7 @@ Donate link:
 Tags: affiliate, posts
 Requires at least: 3.0
 Tested up to: 3.0.1
-Stable tag: trunk
+Stable tag: 0.9
 
 Imports products from product feeds in 2Performant affiliate networks.
 
@@ -27,7 +27,7 @@ Note that you have to embed this information in your theme manually using the `t
 
 = I have installed the plugin, added a product from a feed, but it doesn't show up on my website. Why? =
 
-You have to manually display the product fields using the 
+You have to manually display the product fields using the `tp_the_product_field( $key )` method.
 
 == Screenshots ==
 
@@ -35,10 +35,18 @@ You have to manually display the product fields using the
 
 == Changelog ==
 
+= 0.9.1 =
+* **New Feature** Introduced ability to insert product info dirrectly into post content using the WYSIWYG editor (see *Insert 2Performant Product* button) and shortcode
+* **Bugfix** Product update for drafts/pending products
+* **Bugfix** Campaigns now sorted by name 
+
 = 0.9 =
 * Initial version.
 
 == Upgrade Notice ==
+
+= 0.9.1 =
+Fixes a fatal error shown on environments without required PEAR classes
 
 = 0.9 =
 This version is the first version

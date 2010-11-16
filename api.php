@@ -61,29 +61,38 @@ function tp_feed_dropdown( $options = array() ) {
 //			$categories[$campaign->{'category-id'}] = array();
 //		$categories[$campaign->{'category-id'}][] = $campaign;
 //	}
-//	ksort($categories);
+//	usort($categories);
 
 	$categories = array($campaigns);
 	foreach ( $categories as $category_name => $category ) :
-	ksort($category);
+	usort( $category, function( $a, $b ){
+			return ($a->name == $b->name) ? 0 : ( ( $a->name < $b->name ) ? -1 : 1 ) ;
+	} );
+	/*
 ?>
 	<optgroup label="<?php echo $category_name; ?>">
-<?php	
+<?php
+	//*/	
 	foreach($category as $campaign) :
 	$feeds = fix_result($tp->product_stores_list($campaign->id));
 	if(!empty($feeds))
 ?>
 			<option value="c_<?php echo $campaign->id; ?>" class="level-0"<?php echo $options['value'] == "c_{$campaign->id}" ? ' selected="selected"' : ''; ?>><?php echo htmlspecialchars($campaign->name); ?></option>
 <?php
+	usort($feeds, function($a, $b){
+		return ($a->id == $b->id) ? 0 : ( ( $a->id < $b->id ) ? -1 : 1 ) ;
+	});
 	foreach($feeds as $feed) :
 ?>
 			<option value="f_<?php echo $feed->id; ?>" class="level-1"<?php echo $options['value'] == "f_{$feed->id}" ? ' selected="selected"' : ''; ?>>&nbsp;&nbsp;&nbsp;<?php echo htmlspecialchars($feed->name); ?></option>
 <?php
 	endforeach;
 	endforeach;
+	/*
 ?>
 	</optgroup>
 <?php
+	//*/
 	endforeach;
 ?>
 </select>
@@ -98,7 +107,6 @@ function tp_campaign_dropdown( $options = array() ) {
 <?php
 	$tp = tp_get_wrapper();
 	$campaigns = fix_result($tp->campaigns_listforaffiliate());
-	var_dump($campaigns);
 	
 	// TODO: uncomment mai jos pentru categorii de campanii
 //	$categories = array();
@@ -111,18 +119,24 @@ function tp_campaign_dropdown( $options = array() ) {
 
 	$categories = array($campaigns);
 	foreach ( $categories as $category_name => $category ) :
-	ksort($category);
+	usort( $category, function( $a, $b ){
+			return ($a->name == $b->name) ? 0 : ( ( $a->name < $b->name ) ? -1 : 1 ) ;
+	} );
+	/*
 ?>
 	<optgroup label="<?php echo $category_name; ?>">
-<?php	
+<?php
+	//*/	
 	foreach($category as $campaign) :
 ?>
 			<option value="<?php echo $campaign->id; ?>" class="level-0"<?php echo $options['value'] == $campaign->id ? ' selected="selected"' : ''; ?>><?php echo htmlspecialchars($campaign->name); ?></option>
 <?php
 	endforeach;
+	/*
 ?>
 	</optgroup>
 <?php
+	//*/
 	endforeach;
 ?>
 </select>
