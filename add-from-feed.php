@@ -36,9 +36,9 @@ function tp_product_add_from_feed() {
 	
 	if(isset($_REQUEST['tp_add_filter_feed'])) {
 		$selectFeed = $_REQUEST['tp_add_filter_feed'];
-		if(substr($_REQUEST['tp_add_filter_feed'], 0, strpos($_REQUEST['tp_add_filter_feed'], 'c_')) === '') {
+		if(strpos($_REQUEST['tp_add_filter_feed'], 'c_') === 0) {
 			$campaignID = substr($_REQUEST['tp_add_filter_feed'], 2);
-		} elseif(substr($_REQUEST['tp_add_filter_feed'], 0, strpos($_REQUEST['tp_add_filter_feed'], 'f_')) === '') {
+		} elseif(strpos($_REQUEST['tp_add_filter_feed'], 'f_') === 0) {
 			$feedID = substr($_REQUEST['tp_add_filter_feed'], 2);
 		}
 	}
@@ -117,9 +117,9 @@ function tp_ajax_addproduct_container() {
 	
 	if(isset($_REQUEST['tp_add_filter_feed'])) {
 		$selectFeed = $_REQUEST['tp_add_filter_feed'];
-		if(substr($_REQUEST['tp_add_filter_feed'], 0, strpos($_REQUEST['tp_add_filter_feed'], 'c_')) === '') {
+		if(strpos($_REQUEST['tp_add_filter_feed'], 'c_') === 0) {
 			$campaignID = substr($_REQUEST['tp_add_filter_feed'], 2);
-		} elseif(substr($_REQUEST['tp_add_filter_feed'], 0, strpos($_REQUEST['tp_add_filter_feed'], 'f_')) === '') {
+		} elseif(strpos($_REQUEST['tp_add_filter_feed'], 'f_') === 0) {
 			$feedID = substr($_REQUEST['tp_add_filter_feed'], 2);
 		}
 	}

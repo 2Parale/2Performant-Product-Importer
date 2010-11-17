@@ -27,7 +27,7 @@ function tp_register_insert_product_button( $buttons ) {
  
 // Load the TinyMCE plugin : editor_plugin.js (wp2.5)
 function tp_add_tinymce_plugin( $plugin_array ) {
-	$plugin_array['tp_insert_product'] = WP_PLUGIN_URL . '/' . str_replace( basename(__FILE__), '', plugin_basename(__FILE__) ) . 'tinymce-insert/editor_plugin.js';
+	$plugin_array['tp_insert_product'] = WP_PLUGIN_URL . '/' . str_replace( basename(__FILE__), '', plugin_basename(__FILE__) ) . 'tinymce-insert/editor_plugin.js?v='.TPPI_VERSION;
 	return $plugin_array;
 }
 
@@ -43,9 +43,9 @@ function tp_ajax_insertproduct_container() {
 	
 	if(isset($_REQUEST['tp_insert_filter_feed'])) {
 		$selectFeed = $_REQUEST['tp_insert_filter_feed'];
-		if(substr($_REQUEST['tp_insert_filter_feed'], 0, strpos($_REQUEST['tp_insert_filter_feed'], 'c_')) === '') {
+		if(strpos($_REQUEST['tp_insert_filter_feed'], 'c_') === 0) {
 			$campaignID = substr($_REQUEST['tp_insert_filter_feed'], 2);
-		} elseif(substr($_REQUEST['tp_insert_filter_feed'], 0, strpos($_REQUEST['tp_insert_filter_feed'], 'f_')) === '') {
+		} elseif(strpos($_REQUEST['tp_insert_filter_feed'], 'f_') === 0) {
 			$feedID = substr($_REQUEST['tp_insert_filter_feed'], 2);
 		}
 	}
