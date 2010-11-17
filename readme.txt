@@ -4,7 +4,7 @@ Donate link:
 Tags: affiliate, posts, commerce, products
 Requires at least: 3.0
 Tested up to: 3.0.1
-Stable tag: 0.9.1
+Stable tag: 0.9.2
 
 Imports products from product feeds in 2Performant affiliate networks.
 
@@ -39,6 +39,7 @@ Actually, no. But there's a reason for it: you can do your own styling depending
 
 = 0.9.2 =
 * **Hotfix** Resolves incompatibility with environments running PHP <5.3
+* **Bugfix** Insert product into post box not resizing correctly
 
 = 0.9.1 =
 * **New Feature** Introduced ability to insert product info dirrectly into post content using the WYSIWYG editor (see *Insert 2Performant Product* button) and shortcode
