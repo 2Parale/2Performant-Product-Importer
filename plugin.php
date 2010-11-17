@@ -45,7 +45,7 @@ function tp_plugin_menu() {
 	wp_register_script( 'tp-jquery-product-list', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/jquery.productlist.js', array( 'jquery', 'jquery-infinitescroll' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-settings-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/settings.js', array( 'jquery' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-feed-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/feed.js', array( 'jquery', 'tp-jquery-product-list', 'wp-lists' ), TPPI_VERSION, true );
-	wp_register_script( 'tp-edit-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/edit.js', array( 'jquery' ), TPPI_VERSION, true );
+	wp_register_script( 'tp-edit-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/edit.js', array( 'jquery' ), TPPI_VERSION );
 	wp_register_script( 'tp-listing-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/listing.js', array( 'jquery' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-toolbox-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/toolbox.js', array( 'jquery', 'jquery-ui-progressbar' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-tinymce-insert-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/tinymce-insert/js/insert.js', array( 'jquery', 'tp-jquery-product-list' ), TPPI_VERSION );
