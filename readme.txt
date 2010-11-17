@@ -37,6 +37,9 @@ Actually, no. But there's a reason for it: you can do your own styling depending
 
 == Changelog ==
 
+= 0.9.2 =
+* **Hotfix** Resolves incompatibility with environments running PHP <5.3
+
 = 0.9.1 =
 * **New Feature** Introduced ability to insert product info dirrectly into post content using the WYSIWYG editor (see *Insert 2Performant Product* button) and shortcode
 * **Bugfix** Product update for drafts/pending products
@@ -47,6 +50,9 @@ Actually, no. But there's a reason for it: you can do your own styling depending
 * Initial version.
 
 == Upgrade Notice ==
+
+= 0.9.2 =
+Hotfix for environments running PHP <5.3
 
 = 0.9.1 =
 Fixes a fatal error shown on environments without required PEAR classes. Introduces ability to insert product into post.
