@@ -45,6 +45,13 @@ function tp_verify_connection( &$tp = false ) {
 	return $errors;
 }
 
+function compareByName( $a, $b ){
+		return ($a->name == $b->name) ? 0 : ( ( $a->name < $b->name ) ? -1 : 1 ) ;
+}
+function compareById($a, $b){
+	return ($a->id == $b->id) ? 0 : ( ( $a->id < $b->id ) ? -1 : 1 ) ;
+}
+
 function tp_feed_dropdown( $options = array() ) {
 	$options['value'] = isset( $options['value'] ) ? $options['value'] : '';
 ?>
@@ -64,10 +71,9 @@ function tp_feed_dropdown( $options = array() ) {
 //	usort($categories);
 
 	$categories = array($campaigns);
+	
 	foreach ( $categories as $category_name => $category ) :
-	usort( $category, function( $a, $b ){
-			return ($a->name == $b->name) ? 0 : ( ( $a->name < $b->name ) ? -1 : 1 ) ;
-	} );
+	usort( $category, 'compareByName' );
 	/*
 ?>
 	<optgroup label="<?php echo $category_name; ?>">
@@ -79,9 +85,7 @@ function tp_feed_dropdown( $options = array() ) {
 ?>
 			<option value="c_<?php echo $campaign->id; ?>" class="level-0"<?php echo $options['value'] == "c_{$campaign->id}" ? ' selected="selected"' : ''; ?>><?php echo htmlspecialchars($campaign->name); ?></option>
 <?php
-	usort($feeds, function($a, $b){
-		return ($a->id == $b->id) ? 0 : ( ( $a->id < $b->id ) ? -1 : 1 ) ;
-	});
+	usort($feeds, 'compareById');
 	foreach($feeds as $feed) :
 ?>
 			<option value="f_<?php echo $feed->id; ?>" class="level-1"<?php echo $options['value'] == "f_{$feed->id}" ? ' selected="selected"' : ''; ?>>&nbsp;&nbsp;&nbsp;<?php echo htmlspecialchars($feed->name); ?></option>
@@ -119,9 +123,7 @@ function tp_campaign_dropdown( $options = array() ) {
 
 	$categories = array($campaigns);
 	foreach ( $categories as $category_name => $category ) :
-	usort( $category, function( $a, $b ){
-			return ($a->name == $b->name) ? 0 : ( ( $a->name < $b->name ) ? -1 : 1 ) ;
-	} );
+	usort( $category, 'compareByName' );
 	/*
 ?>
 	<optgroup label="<?php echo $category_name; ?>">
