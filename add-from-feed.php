@@ -117,9 +117,9 @@ function tp_ajax_addproduct_container() {
 	
 	if(isset($_REQUEST['tp_add_filter_feed'])) {
 		$selectFeed = $_REQUEST['tp_add_filter_feed'];
-		if(strstr($_REQUEST['tp_add_filter_feed'], 'c_', true) === '') {
+		if(substr($_REQUEST['tp_add_filter_feed'], 0, strpos($_REQUEST['tp_add_filter_feed'], 'c_')) === '') {
 			$campaignID = substr($_REQUEST['tp_add_filter_feed'], 2);
-		} elseif(strstr($_REQUEST['tp_add_filter_feed'], 'f_', true) === '') {
+		} elseif(substr($_REQUEST['tp_add_filter_feed'], 0, strpos($_REQUEST['tp_add_filter_feed'], 'f_')) === '') {
 			$feedID = substr($_REQUEST['tp_add_filter_feed'], 2);
 		}
 	}

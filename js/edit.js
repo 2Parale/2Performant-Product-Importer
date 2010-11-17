@@ -19,20 +19,6 @@
 			}, "text");
 		});
 		
-		tp_insert_tb_setsize = function() {
-			var tbWindow = $('#TB_window'),
-				w=940,
-				h=$(window).height()-60;
-			
-			console.log(tbWindow.width(), tbWindow.height());
-			if(tbWindow.size()) {
-				tbWindow.width(w).height(h);
-				$('#TB_iframeContent').width(w).height(h - 27);
-				tbWindow.css({'margin-left': '-' + parseInt((w / 2),10) + 'px'});
-				if ( typeof document.body.style.maxWidth != 'undefined' )
-					tbWindow.css({'top':'30px','margin-top':'0'});
-			}
-		};
 		$(window).resize( function() { tp_insert_tb_setsize() } );
 	});
 })(jQuery.noConflict());

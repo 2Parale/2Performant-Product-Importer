@@ -183,7 +183,6 @@
 					}
 					
 					var force = parseInt($('#tp_toolbox_deletecampaign_force:checked').size()) > 0;
-					console.log($('#tp_toolbox_deletecampaign_force:checked').size(), force);
 					
 					$.tpDelCampInfo.products = r.response.ids;
 					$.tpDelCampInfo.products.length = getObjectLength($.tpDelCampInfo.products);
