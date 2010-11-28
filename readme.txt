@@ -10,7 +10,7 @@ Imports products from product feeds in 2Performant affiliate networks.
 
 == Description ==
 
-Use this plugin to insert product data in your posts' custom fields.
+Use this plugin to insert product data in your posts' content or custom fields.
 
 It requires authentication as an affiliate in one of these networks. Products are imported as individual posts (or other custom post types, configurable) which can use several custom fields based on product info from the feeds.
 
@@ -25,6 +25,13 @@ Note that you have to embed this information in your theme manually using the `t
 
 == Frequently Asked Questions ==
 
+= What do I do after installing and setting up the plugin? =
+You can add products using one of these metehods:
+
+1. *Posts (or other custom post type you selected)* > *Add from feed* - Select a product and *Add* it, choosing the category it should reside in.
+
+1. *Posts/Pages* > *Add new* - Use the *Insert 2Performant Product* button on the visual editor (the last button on the first row), choose a product and click *Insert*
+
 = I have installed the plugin, added a product from a feed, but it doesn't show up on my website. Why? =
 You have to manually display the product fields using the `tp_the_product_field( $key )` method.
 
@@ -38,16 +45,19 @@ Actually, no. But there's a reason for it: you can do your own styling depending
 == Changelog ==
 
 = 0.9.2 =
+
 * **Hotfix** Resolves incompatibility with environments running PHP <5.3
 * **Bugfix** Insert product into post box not resizing correctly
 
 = 0.9.1 =
+
 * **New Feature** Introduced ability to insert product info dirrectly into post content using the WYSIWYG editor (see *Insert 2Performant Product* button) and shortcode
 * **Bugfix** Product update for drafts/pending products
 * **Bugfix** Campaigns now sorted by name
 * **Bugfix** Does not delete regular posts on update
 
 = 0.9 =
+
 * Initial version.
 
 == Upgrade Notice ==

@@ -37,6 +37,10 @@ function tp_verify_connection( &$tp = false ) {
 					$errors[] = 'Logged in user is not an affiliate';
 			} else {
 				$errors[] = 'Invalid API response. Please verify settings and contact affiliate network administrator.';
+				ob_start();
+				print_r( $response );
+				trigger_error( 'API response: ' . ob_get_contents(), E_USER_WARNING );
+				ob_end_clean();
 			}
 		} catch( HTTP_Request2_Exception $e ) {
 			$errors[] = 'Invalid API URL';

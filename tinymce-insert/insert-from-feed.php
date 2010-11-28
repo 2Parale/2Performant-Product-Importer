@@ -61,7 +61,7 @@ do_action('admin_head');
 <?php foreach ( $errors as $e ) : ?>
 		<p><?php _e( $e, 'tppi' ); ?></p>
 <?php endforeach; ?>
-		<p><?php _e('Please check <a href="options-general.php?page=2performant-product-importer">settings page</a>', 'tppi'); ?></p>
+		<p><?php printf( __('Please check <a href="%1$s" target="_parent">settings page</a>', 'tppi'), get_bloginfo( 'url' ). '/wp-admin/options-general.php?page=2performant-product-importer'); ?></p>
 	</div>
 <?php elseif ( ! $tp ) : ?>
 	<div>
