@@ -5,11 +5,6 @@
    http://help.2performant.com/API
    ================================ */
 
-ini_set(
-  'include_path',
-  ini_get( 'include_path' ) . PATH_SEPARATOR . "2pphp/PEAR/" . PATH_SEPARATOR . "2pphp/" . PATH_SEPARATOR . "PEAR/"
-);
-
 require_once 'HTTP/Request2.php';
 require_once 'XML/Serializer.php';
 require_once 'XML/Unserializer.php';
@@ -636,7 +631,7 @@ function user_loggedin() {
                 
                 //authorize
                 $req->setAuth($this->user, $this->pass);
-
+                
                 if ($params) {
                         //serialize the data
                         $xml = $this->serialize($params);
