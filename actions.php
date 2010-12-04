@@ -2,7 +2,7 @@
 
 function tp_strtopinfo( $str, $info ) {
 	foreach ( $info as $var => $value ) {
-		$str = str_replace( "%{$var}%", $value, $str );
+		$str = str_replace( "%{$var}%", esc_attr( $value ), $str );
 	}
 	
 	return $str;

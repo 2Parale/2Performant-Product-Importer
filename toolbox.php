@@ -191,7 +191,8 @@ class TP_AJAX_wrapper {
 		
 		return array(
 			'errors' => $errors,
-			'id' => $id
+			'id' => $id,
+			'name' => $p->post_title
 		);
 	}
 	
@@ -204,6 +205,8 @@ class TP_AJAX_wrapper {
 			throw new Exception( __( 'Undefined post ID' ) );
 		
 		$p = get_post( $id );
+		if ( ! $p )
+			throw new Exception( sprintf( __( 'Invalid post ID: %1$s' ), $id ) );
 		
 		$att_id = get_post_meta( $id, '_thumbnail_id' );
 		if ( $force && ! wp_delete_attachment( $att_id, true ) )
@@ -214,7 +217,8 @@ class TP_AJAX_wrapper {
 		
 		return array(
 			'errors' => $errors,
-			'id' => $id
+			'id' => $id,
+			'name' => $p->post_title
 		);
 	}
 }
