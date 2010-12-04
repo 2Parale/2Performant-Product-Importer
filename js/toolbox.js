@@ -133,14 +133,14 @@
 								post_id: pid
 							},
 							function(r,s,x){
-								var data = $.unserialize(this.data), _pid = data.post_id;
+								var data = $.unserialize(this.data), _pid = data.post_id, post_name = r.response.name || _pid;
 								if(r.responseStatus == 'ok'){
 									$.tpUpdateInfo.successfullyProcessedProducts++;
 									if(r.response.errors)
 										for(j in r.response.errors){
-											$('#tp_updateall_log').tpLogWarning('Updating product '+_pid+': '+r.response.errors[j]);
+											$('#tp_updateall_log').tpLogWarning('Updating product '+post_name+': '+r.response.errors[j]);
 										}
-									$('#tp_updateall_log').tpLogMessage('Product '+_pid+' updated');
+									$('#tp_updateall_log').tpLogMessage('Product '+post_name+' updated');
 								} else {
 									$('#tp_updateall_log').tpLogError('Error updating product: '+r.error);
 								}
@@ -219,15 +219,15 @@
 								force: force
 							},
 							function(r,s,x){
-								var data = $.unserialize(this.data), _pid = data.post_id;
+								var data = $.unserialize(this.data), _pid = data.post_id, post_name = r.response.name || _pid;
 								
 								if(r.responseStatus == 'ok'){
 									$.tpDelCampInfo.successfullyProcessedProducts++;
 									if(r.response.errors)
 										for(j in r.response.errors){
-											$('#tp_deletecampaign_log').tpLogWarning('Updating product '+_pid+': '+r.response.errors[j]);
+											$('#tp_deletecampaign_log').tpLogWarning('Updating product '+post_name+': '+r.response.errors[j]);
 										}
-									$('#tp_deletecampaign_log').tpLogMessage('Product '+_pid+' '+(force?'deleted':'sent to trash'));
+									$('#tp_deletecampaign_log').tpLogMessage('Product '+post_name+' '+(force?'deleted':'sent to trash'));
 								} else {
 									$('#tp_deletecampaign_log').tpLogError('Error updating product: '+r.error);
 								}

@@ -3,8 +3,8 @@ Contributors: 2parale, tetele
 Donate link: 
 Tags: affiliate, posts, commerce, products
 Requires at least: 3.0
-Tested up to: 3.0.1
-Stable tag: 0.9.2
+Tested up to: 3.0.2
+Stable tag: 0.9.3
 
 Imports products from product feeds in 2Performant affiliate networks.
 
@@ -18,7 +18,7 @@ Note that you have to embed this information in your theme manually using the `t
 
 == Installation ==
 
-1. Upload `2performant-product-importer` to the `/wp-content/plugins/` directory
+1. Unzip and upload `2performant-product-importer` to the `/wp-content/plugins/` directory of your site
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Configure the plugin's settings
 1. Place `<?php tp_the_product_info('info_field'); ?>` in your templates
@@ -36,29 +36,23 @@ You can add products using one of these metehods:
 You have to manually display the product fields using the `tp_the_product_field( $key )` method.
 
 = Whoa! That product snippet looks totally awkward on my blog. You call that looking good? =
-Actually, no. But there's a reason for it: you can do your own styling depending on your theme and imagination. Just add some CSS for the mentioned classes and you should be OK.
-
-== Screenshots ==
-
-1. The settings panel
+Actually, no. But there's a reason for it: you can customize the output depending on your theme and imagination. Just go to the settings page and edit the output template.
 
 == Changelog ==
 
-= 0.9.2 =
+= 0.9.3 =
+* **New Feature** Customizable product template - change the way the inserted product shows up on your website
+* **Bugfix** Several minor bugfixes and security issues handled
 
+= 0.9.2 =
 * **Hotfix** Resolves incompatibility with environments running PHP <5.3
 * **Bugfix** Insert product into post box not resizing correctly
 
 = 0.9.1 =
-
 * **New Feature** Introduced ability to insert product info dirrectly into post content using the WYSIWYG editor (see *Insert 2Performant Product* button) and shortcode
 * **Bugfix** Product update for drafts/pending products
 * **Bugfix** Campaigns now sorted by name
 * **Bugfix** Does not delete regular posts on update
-
-= 0.9 =
-
-* Initial version.
 
 == Upgrade Notice ==
 

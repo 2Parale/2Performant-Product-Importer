@@ -109,9 +109,13 @@ function tp_product_shortcode( $atts ) {
 	$html = '';
 	$pinfo = tp_get_wrapper()->product_store_showitem( $feed, $id );
 	
-	if( empty( $pinfo ) )
+	if( empty( $pinfo ) || isset( $pinfo->error ) )
 		return false;
-	ob_start();
+	
+	$template = get_option( 'tp_options_templates' );
+	
+	if( $template === false ) {
+		ob_start();
 ?>
 	<div class="tp-product-info">
 <?php if( isset($pinfo->{'image-url'} ) ) : ?>
@@ -128,9 +132,14 @@ function tp_product_shortcode( $atts ) {
 		</div>
 	</div>
 <?php
-	$html = ob_get_contents();
-	
-	ob_end_clean();
+		$html = ob_get_contents();
+		
+		ob_end_clean();
+	} else {
+		$template = $template['template'];
+		
+		$html = tp_strtopinfo( $template, $pinfo );
+	}
 
 	return $html;
 }

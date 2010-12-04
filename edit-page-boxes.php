@@ -42,6 +42,11 @@ function tp_product_info_inner_boxes() {
 	}
 ?>
 	<input type="hidden" id="tp_post_id" value="<? echo $post->ID; ?>" />
+	<style type="text/css">
+	#tp_product_info .tp_product_field {
+		width: 98%;
+	}
+	</style>
 <?php
 	
 	// Use nonce for verification
@@ -66,10 +71,10 @@ function tp_product_info_inner_boxes() {
 <?php
 	switch($type) {
 		case 'text':
-?><input type="text" id="tp_product_<?php echo $name; ?>" name="tp_product_<?php echo $name; ?>" value="<?php echo $var['value']; ?>" /><?php
+?><input type="text" class="tp_product_field" id="tp_product_<?php echo $name; ?>" name="tp_product_<?php echo $name; ?>" value="<?php echo $var['value']; ?>" /><?php
 			break;
 		case 'textarea':
-?><textarea id="tp_product_<?php echo $name; ?>" name="tp_product_<?php echo $name; ?>" cols="40" rows="15"><?php echo $var['value']; ?></textarea><?php
+?><textarea class="tp_product_field" id="tp_product_<?php echo $name; ?>" name="tp_product_<?php echo $name; ?>" cols="40" rows="15"><?php echo $var['value']; ?></textarea><?php
 			break;
 	}
 ?>
