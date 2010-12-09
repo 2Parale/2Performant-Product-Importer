@@ -179,7 +179,7 @@ class TP_AJAX_wrapper {
 		if ( ! $live_product ) {
 			// Delete the post
 			wp_delete_post( $id );
-			throw new Exception( sprintf( __( 'Expired product: %1$s' ), $product->id ) );
+			throw new Exception( sprintf( __( 'Expired product: %1$s' ), tp_strtopinfo( '%brand% %title% (%id%)', $product ) ) );
 		}
 		
 		$new_id = tp_add_product_from_feed( $product->id, $product->{'product-store-id'} );

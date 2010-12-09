@@ -133,8 +133,9 @@
 								post_id: pid
 							},
 							function(r,s,x){
-								var data = $.unserialize(this.data), _pid = data.post_id, post_name = r.response.name || _pid;
+								var data = $.unserialize(this.data), _pid = data.post_id;
 								if(r.responseStatus == 'ok'){
+									var post_name = r.response.name || _pid;
 									$.tpUpdateInfo.successfullyProcessedProducts++;
 									if(r.response.errors)
 										for(j in r.response.errors){
