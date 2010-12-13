@@ -3,8 +3,8 @@ Contributors: 2parale, tetele
 Donate link: 
 Tags: affiliate, posts, commerce, products
 Requires at least: 3.0
-Tested up to: 3.0.2
-Stable tag: 0.9.3
+Tested up to: 3.0.3
+Stable tag: 0.9.4
 
 Imports products from product feeds in 2Performant affiliate networks.
 
@@ -39,6 +39,9 @@ You have to manually display the product fields using the `tp_the_product_field(
 Actually, no. But there's a reason for it: you can customize the output depending on your theme and imagination. Just go to the settings page and edit the output template.
 
 == Changelog ==
+
+= 0.9.4 =
+* **Bugfix** Now shows failed updated in update log and displays summary when some products fail update.
 
 = 0.9.3 =
 * **New Feature** Customizable product template - change the way the inserted product shows up on your website
