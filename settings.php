@@ -1,0 +1,350 @@
+<?php
+if ( is_admin() ) :
+
+function tp_register_settings() {
+	$settings = array(
+		'connection' => array(
+			'label' => 'Connection settings',
+			'settings' => array(
+				'network' => array(
+					'type' => 'text',
+					'label' => 'Network API URL',
+					'description' => 'E.g. <code>http://api.network.com</code>'
+				),
+				'username' => array(
+					'type' => 'text',
+					'label' => 'Username'
+				),
+				'password' => array(
+					'type' => 'password',
+					'label' => 'Password'
+				)
+			)
+		),
+		'add_feed' => array(
+			'label' => 'When adding from a feed',
+			'settings' => array(
+				'post_type' => array(
+					'type' => 'custom',
+					'callback' => 'tp_render_post_type_select',
+					'label' => 'Destination post type',
+					'description' => 'Will products be posts, pages or another kind of custom posts',
+					'options' => get_post_types( array( 'public' => true ), 'objects' ),
+					'default' => 'post'
+				),
+				'post_status' => array(
+					'type' => 'select',
+					'label' => 'Default post status',
+					'description' => 'The state of the post immediately after adding it from a feed',
+					'options' => array(
+						'draft' => 'Draft',
+						'publish' => 'Published'
+					),
+					'default' => 'draft'
+				)
+			)
+		),
+		'fields' => array(
+			'label' => 'Metadata to get when mass-importing',
+			'settings' => array(
+				'fields' => array(
+					'type' => 'custom',
+					'label' => 'Product fields',
+					'callback' => 'tp_render_options_fields_fields'
+				),
+				'other_fields' => array(
+					'type' => 'custom',
+					'callback' => 'tp_render_options_fields_other_fields',
+					'label' => 'Other custom fields'
+				)
+			)
+		),
+		'templates' => array(
+			'label' => 'Inserting products into post',
+			'settings' => array(
+				'template' => array(
+					'type' => 'textarea',
+					'label' => 'User-defined output template',
+					'default' => '<div class="tp-product-info">
+	<div class="tp-product-thumbnail">
+		<a href="%aff_link%">
+			<img src="%image-url%" />
+		</a>
+	</div>
+	<div class="tp-product-meta">
+		<span class="tp-product-brand">%brand%</span>
+		<span class="tp-product-title">%title%</span>
+		<span class="tp-product-price">%price%</span>
+	</div>
+</div>'
+				)
+			)
+		)
+	);
+	
+//	register_setting( 'tp-options-group', 'tp_options_post_type' );
+//	register_setting( 'tp-options-group', 'tp_options_fields' );
+	
+	foreach ( $settings as $section_id => $section ) {
+		register_setting( 'tp-options-group', "tp_options_{$section_id}" );
+		add_settings_section( "tp_options_{$section_id}", __( $section['label'], 'tppi' ), 'tp_section_callback', 'tp-options' );
+		$values = get_option( "tp_options_{$section_id}" );
+		$defaults = ( $values === false );
+		if ( $values === false ) {
+			$values = array();
+		}
+		foreach ( $section['settings'] as $setting_id => $setting ) {
+			$setting['id'] = "tp_options_{$section_id}_{$setting_id}";
+			$setting['name'] = "tp_options_{$section_id}[{$setting_id}]";
+			$setting['value'] = isset( $values[$setting_id] ) ? $values[$setting_id] : ( $values[$setting_id] = $setting['default'] );
+			add_settings_field( "tp_options_{$section_id}_{$setting_id}", __( $setting['label'], 'tppi' ), 'tp_render_field', 'tp-options', "tp_options_{$section_id}", $setting );			
+		}
+		if ( $defaults )
+			update_option( "tp_options_{$section_id}", $values );
+	}
+}
+
+function tp_section_callback() {}
+
+function tp_render_field( $setting ) {
+	extract( $setting );
+	$type = empty( $type ) ? 'text' : $type;
+	$class = isset( $class ) ? $class : array();
+	$class = is_array( $class ) ? $class : array ( $class );
+	
+	$output = '';
+	switch ( $type ) {
+		case 'select':
+			if ( isset( $options ) && is_array( $options ) ) {
+				foreach ( $options as $key => $option ) {
+					$selected = $key == $value ? 'selected="selected"' : '';
+					$output .= "<option value='".esc_attr($key)."' {$selected}>" . esc_attr( $option ) . "</option>";
+				}
+			}
+			$class = implode( ' ', $class );
+			$output = "<select name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "' class='".esc_attr( $class ) . "'>$output</select>";
+			break;
+		case 'text':
+		case 'password':
+			$class = array_merge( array ( 'regular-text' ), $class );
+			$class = implode( ' ', $class );
+			$output = "<input type='" . esc_attr( $type ) . "' class='" . esc_attr( $class ) . "' name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "' value='" . esc_attr( $value ) . "' />";
+			break;
+		case 'textarea':
+			$class = array_merge( array ( 'large-text', 'code' ), $class );
+			$class = implode( ' ', $class );
+			$output = "<textarea rows='10' cols='50' class='" . esc_attr( $class ) . "' name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "'>" . esc_attr( $value ) . "</textarea>";
+			break;
+		case 'custom':
+			if ( isset( $callback ) ) {
+				$output .= call_user_func( $callback, $setting );
+			}
+			break;
+		default:
+			trigger_error( 'Invalid setting type', E_WARNING );
+	}
+	
+	if ( isset( $description ) )
+		$output .= " <span class='description'>" . esc_attr( $description ) . "</span>";
+	
+	echo $output;
+}
+
+function tp_render_post_type_select( $setting ) {
+	extract( $setting );
+	$type = empty( $type ) ? 'text' : $type;
+	$class = isset( $class ) ? $class : array();
+	$class = is_array( $class ) ? $class : array ( $class );
+	
+	if ( isset( $options ) && is_array( $options ) ) {
+		foreach ( $options as $option ) {
+			$selected = $option->name == $value ? 'selected="selected"' : '';
+			$output .= "<option value='{$option->name}' {$selected}>{$option->label}</option>";
+		}
+	}
+	$class = implode( ' ', $class );
+	$output = "<select name='$name' id='$id' class='$class'>$output</select>";
+	
+	return $output;
+}
+
+$field_names = array(
+	'brand',
+	'price',
+	'product-store-id',
+	'category',
+	'created-at',
+	'subcategory',
+	'delta',
+	'title',
+	'campaign-id',
+	'updated-at',
+	'url',
+	'id',
+	'other-data',
+	'update-type',
+	'caption',
+	'clicks',
+	'promoted',
+	'unique-code',
+	'description',
+	'prid',
+	'active',
+	'image-url',
+	'image_urls',
+	'aff_link'
+);
+
+function tp_render_options_fields_fields( $setting ) {
+	extract($setting);
+	if ( ! $value )
+		$value = array(
+			'brand' => array(
+				'type' => 'text',
+				'label' => 'Product brand name',
+				'value' => '%brand%'
+			),
+			'title' => array(
+				'type' => 'text',
+				'label' => 'Product name',
+				'value' => '%title%'
+			),
+			'description' => array(
+				'type' => 'textarea',
+				'label' => 'Product description',
+				'value' => '%description%'
+			),
+			'price' => array(
+				'type' => 'text',
+				'label' => 'Product price',
+				'value' => '%price%'
+			),
+			'aff_link' => array(
+				'type' => 'text',
+				'label' => 'Affiliate link',
+				'value' => '%aff_link%'
+			),
+		);
+		foreach ( $value as $kk => $vv ) {
+			$value[$kk]['selectable_type'] = true;
+		}
+?>
+	<p class="description"><?php printf( __( 'See <a href="#" id="%1$s">help section</a> above for details', 'tppi' ), 'tp_options_fields_fields_help' ); ?></p>
+	<script type="text/javascript"><!--//<![CDATA[
+		var tp_options_fields_fields = <?php echo json_encode( $value ); ?>,
+			tp_options_fields_fields_name = '<?php echo $name?>';
+	//]]--></script><a name="tp_options_fields_fields" id="tp_options_fields_fields_anchor"></a>
+<?php
+	//*
+	echo "<table id='tp_fields_fields' class='fields'>";
+	echo "<tr class='head'><th></th><th scope='column'>" . __( 'Key', 'tppi' ) . "</th><th scope='column'>" . __( 'Value', 'tppi' ) . "</th></tr>";
+	foreach ( $value as $i => $p ) {
+		echo "<tr class='product_field tp_$i'><th scope='row'>" . $p['label'] . "</th><td class='product_field_key'><em>" . esc_attr( $i ) . "</em></td><td class='product_field_value'>" . esc_attr( $p['value'] );
+		foreach ( $p as $j => $v ) {
+			echo "<input type='hidden' name='{$name}[{$i}][{$j}]' id='{$id}_{$i}_{$j}' value='$v' />";
+		}
+		echo "</td></tr>";
+	}
+	echo "</table>";
+	//*/
+}
+
+function tp_render_options_fields_other_fields( $setting ) {
+	extract($setting);
+	if ( ! $value )
+		$value = array();
+?>
+	<p class="description"><?php printf( __( 'See <a href="#" id="%1$s">help section</a> above for details', 'tppi' ), 'tp_options_fields_other_fields_help' ); ?></p>
+	<script type="text/javascript"><!--//<![CDATA[
+		var tp_options_fields_other_fields = <?php echo json_encode( $value ); ?>,
+			tp_options_fields_other_fields_name = '<?php echo $name?>';
+	//]]--></script><a name="tp_options_fields_other_fields" id="tp_options_fields_other_fields_anchor"></a>
+<?php
+	//*
+	echo "<table id='tp_fields_other_fields' class='fields'>";
+	echo "<tr class='head'><th></th><th scope='column'>" . __( 'Key', 'tppi' ) . "</th><th scope='column'>" . __( 'Value', 'tppi' ) . "</th></tr>";
+	foreach ( $value as $i => $p ) {
+		echo "<tr class='product_field tp_$i'><th scope='row'>" . $p['label'] . "</th><td class='product_field_key'><em>" . esc_attr( $i ) . "</em></td><td class='product_field_value'>" . esc_attr( $p['value'] );
+		foreach ( $p as $j => $v ) {
+			echo "<input type='hidden' name='{$name}[{$i}][{$j}]' id='{$id}_{$i}_{$j}' value='$v' />";
+		}
+		echo "</td></tr>";
+	}
+	echo "</table>";
+	//*/
+}
+
+function tp_plugin_settings() {
+	include_once 'api.php';
+	
+	if ( ! current_user_can( 'manage_options' ) )  {
+		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+	}
+	
+	$errors = tp_verify_connection();
+	
+?>
+<style type="text/css">
+table.tp-field-table th {
+	font-weight: bold;
+}
+table.tp-field-table textarea {
+	height: 100px;
+}
+</style>
+<div class="wrap">
+	<?php if ( function_exists( 'screen_icon' ) ) screen_icon(); ?><h2>2Performant Product Importer</h2>
+<?php if ( ! empty( $errors ) ) : ?>
+	<div id="setting-error-options_error" class="error settings-error">
+<?php foreach ( $errors as $e ) : ?>
+		<p><?php _e( $e, 'tppi' ); ?></p>
+<?php endforeach; ?>
+	</div>
+<?php endif; ?>
+	<form name="form" action="options.php" method="post">
+	<?php settings_fields( 'tp-options-group' ); ?>
+	<?php do_settings_sections('tp-options'); ?>
+	<p class="submit">
+		<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+	</p>
+	</form>
+</div><?php
+}
+
+function tp_plugin_settings_help( $contextual_help, $screen_id, $screen ) {
+	global $tp_plugin_settings_page;
+	global $field_names;
+	
+	if ( $screen_id != $tp_plugin_settings_page )
+		return $contextual_help;
+	
+	$desc = sprintf( __( 'The new %1$s from %2$s: %3$s', 'tppi' ), '%title%', '%brand%', '%caption%' );
+	$result = sprintf( __( 'The new %1$s from %2$s: %3$s', 'tppi' ), 'men\'s sneakers', 'Nike', 'Now on sale!' );
+	ob_start();
+	
+?>
+	<p><?php _e( 'This is your command center for the 2Performant Product Importer.' ); ?></p>
+	<h3><?php _e( 'Connection settings', 'tppi' ); ?></h3>
+	<p><strong><?php _e( 'Network API URL', 'tppi' ); ?></strong> - <?php printf( __( 'If you\'re unsure, ask your affiliate network operator for this. It\'s usually %1$s, where %2$s is your network.', 'tppi' ), '<code>api.network.com</code>', '<code>network.com</code>' ); ?></p>
+	<p><strong><?php _e( 'Username', 'tppi' ); ?> &amp; <?php _e( 'Password', 'tppi' ); ?></strong> - <?php _e( 'Self explanatory.', 'tppi' ); ?></p>
+	<h3><?php _e( 'When adding from a feed', 'tppi' ); ?></h3>
+	<p><strong><?php _e( 'Destination post type', 'tppi' ); ?></strong> - <?php printf( __( 'Wordpress supports <a href="%1$s" target="_blank">Custom Post Types</a>, which you can use to create your own custom post type (e.g. %2$s) to import and show off products. Or you can opt for the built-in post types.', 'tppi' ), 'http://codex.wordpress.org/Custom_Post_Types', '<code>product</code>' ); ?></p>
+	<p><strong><?php _e( 'Default post status', 'tppi' ); ?></strong> - <?php _e( 'When you import a product from a feed you can have the destination post wait for you to publish it or you can immediately send it to your target audience.', 'tppi' ); ?></p>
+	<h3><?php _e( 'Metadata to get when mass-importing', 'tppi' ); ?></h3>
+	<p><strong><?php _e( 'Product fields', 'tppi' ); ?></strong> - <?php printf( __('These are the fields you can use in your custom theme. The syntax is %1$s, where %2$s is the WordPress field name and %3$s is the value of the product info field from 2Performant.', 'tppi'), "<code>tp_the_product_field( 'wp-key' )</code>", '<code>wp-key</code>', '<code>%product-key%</code>' ); ?></p>
+	<p><strong><?php _e( 'Other custom fields', 'tppi' ); ?></strong> - <?php printf( __( '<a href="%1$s" target="_blank">Custom fields</a> that can originally be set by other plugins, but whose values you want to override. For example you could set %2$s\'s %3$s custom field to something like %4$s in order to get %5$s.', 'tppi'), 'http://codex.wordpress.org/Custom_Fields', "<a href='http://wordpress.org/extend/plugins/all-in-one-seo-pack/' target='_blank'>All in One SEO Pack</a>", '<code>_aioseop_description</code>', '<code>'.$desc.'</code>', '<em>'.$result.'</em>' ); ?></p>
+	<p><?php echo sprintf( __('Possible product info fields are: %1$s.', 'tppi'), '<code>%' . implode( '%</code>, <code>%', $field_names ) . '%</code>' ); ?></p>
+	<h3><?php _e( 'Inserting products into post', 'tppi' ); ?></h3>
+	<p><strong><?php _e( 'User-defined output template', 'tppi' ); ?></strong> - <?php printf( __('This defines how the products inserted into the post via the button on the <abbr title="What You See Is What You Get">WYSIWYG</abbr> (visual) editor will look like. You can use the product info fields mentioned above using the %1$s syntax described above.', 'tppi'), '<code>%product-info-field%</code>' ); ?></p>
+	<p><strong><?php _e( 'For more information' ); ?></strong></p>
+<?php
+	
+	$contextual_help = ob_get_contents() . $contextual_help;
+	ob_end_clean();
+	
+	return $contextual_help;
+}
+
+endif;
+
+?>
