@@ -68,39 +68,36 @@ function tp_product_toolbox() {
 	endif;
 }
 
-
-class TP_AJAX_wrapper {
 	
-	public static function __callStatic( $name, $args = null ) {
-		check_ajax_referer( 'tp_ajax_nonce' );
-		
-		$out = array();
-		
-		try {
-			$res = call_user_func( array( __CLASS__, $name ) );
-		} catch(Exception $e) {
-			$out['error'] = $e->getMessage();
-		}
-		
-		$out['responseStatus'] = $res ? 'ok' : 'null';
-		$out['response'] = $res;
-		
-		echo json_encode($out);
-		
-		die();
-	}
+function TP_AJAX_wrapper_getNumProducts() {
+	check_ajax_referer( 'tp_ajax_nonce' );
 	
-	protected static function getNumProducts() {
+	$out = array();
+	
+	try {
 		$numposts = wp_count_posts( tp_get_post_type() );
 		
 		$res = array(
 			'numProducts' => $numposts->publish
 		);
-		
-		return $res;
+	} catch(Exception $e) {
+		$out['error'] = $e->getMessage();
 	}
 	
-	protected static function getProducts() {
+	$out['responseStatus'] = $res ? 'ok' : 'null';
+	$out['response'] = $res;
+	
+	echo json_encode($out);
+	
+	die();
+}
+
+function TP_AJAX_wrapper_getProducts() {
+	check_ajax_referer( 'tp_ajax_nonce' );
+	
+	$out = array();
+	
+	try {
 		$prods = get_posts( array(
 			'type' => tp_get_post_type(),
 			'post_status' => array( 'publish', 'draft', 'pending' ),
@@ -123,11 +120,24 @@ class TP_AJAX_wrapper {
 		}
 		
 		$res = array ( 'ids' => $prods );
-		
-		return $res;
+	} catch(Exception $e) {
+		$out['error'] = $e->getMessage();
 	}
 	
-	protected static function getCampaignProducts() {
+	$out['responseStatus'] = $res ? 'ok' : 'null';
+	$out['response'] = $res;
+	
+	echo json_encode($out);
+	
+	die();
+}
+	
+function TP_AJAX_wrapper_getCampaignProducts() {
+	check_ajax_referer( 'tp_ajax_nonce' );
+	
+	$out = array();
+	
+	try {
 		$prods = get_posts( array(
 			'type' => tp_get_post_type(),
 			'numberposts' => -1,
@@ -139,21 +149,32 @@ class TP_AJAX_wrapper {
 		
 		foreach ( $prods as $k => $v ) {
 			$data = tp_get_post_product_data( $v->ID );
-//			var_dump($campaign_id,$data->{'campaign-id'},$data->{'campaign-id'} != $campaign_id);
 			if ( $campaign_id && $data && $data->{'campaign-id'} == $campaign_id ) {
 				$prods[$k] = $v->ID;
 			} else {
 				unset( $prods[$k] );
 			}
 		}
-//		var_dump($prods);
 		
 		$res = array ( 'ids' => $prods );
-		
-		return $res;
+	} catch(Exception $e) {
+		$out['error'] = $e->getMessage();
 	}
 	
-	protected static function updateProduct() {
+	$out['responseStatus'] = $res ? 'ok' : 'null';
+	$out['response'] = $res;
+	
+	echo json_encode($out);
+	
+	die();
+}
+	
+function TP_AJAX_wrapper_updateProduct() {
+	check_ajax_referer( 'tp_ajax_nonce' );
+	
+	$out = array();
+	
+	try {
 		$errors = array();
 		$id = ( isset( $_REQUEST['post_id'] ) && is_numeric( $_REQUEST['post_id'] ) ) ? $_REQUEST['post_id'] : false;
 		
@@ -189,14 +210,29 @@ class TP_AJAX_wrapper {
 		else
 			$id = $new_id;
 		
-		return array(
+		$res = array(
 			'errors' => $errors,
 			'id' => $id,
 			'name' => $p->post_title
 		);
+	} catch(Exception $e) {
+		$out['error'] = $e->getMessage();
 	}
 	
-	protected static function deleteProduct() {
+	$out['responseStatus'] = $res ? 'ok' : 'null';
+	$out['response'] = $res;
+	
+	echo json_encode($out);
+	
+	die();
+}
+	
+function TP_AJAX_wrapper_deleteProduct() {
+	check_ajax_referer( 'tp_ajax_nonce' );
+	
+	$out = array();
+	
+	try {
 		$errors = array();
 		$id = ( isset( $_REQUEST['post_id'] ) && is_numeric( $_REQUEST['post_id'] ) ) ? $_REQUEST['post_id'] : false;
 		$force = ( isset( $_REQUEST['force'] ) && $_REQUEST['force'] !== 'false' ) ? $_REQUEST['force'] : false;
@@ -215,12 +251,21 @@ class TP_AJAX_wrapper {
 		if ( ! wp_delete_post( $id, $force ) )
 			throw new Exception( sprintf(__( 'Could not delete post %s' ), $id ) );
 		
-		return array(
+		$res = array(
 			'errors' => $errors,
 			'id' => $id,
 			'name' => $p->post_title
 		);
+	} catch(Exception $e) {
+		$out['error'] = $e->getMessage();
 	}
+	
+	$out['responseStatus'] = $res ? 'ok' : 'null';
+	$out['response'] = $res;
+	
+	echo json_encode($out);
+	
+	die();
 }
 
 $ajax_actions = array(
@@ -231,7 +276,7 @@ $ajax_actions = array(
 	'deleteProduct'
 );
 foreach ( $ajax_actions as $action ) {
-	add_action ( 'wp_ajax_tp_'.$action, array( 'TP_AJAX_wrapper', $action ) );
+	add_action ( 'wp_ajax_tp_'.$action, 'TP_AJAX_wrapper_' . $action );
 }
 
 endif;
