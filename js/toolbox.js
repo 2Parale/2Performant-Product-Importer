@@ -81,84 +81,143 @@
 			products: 0,
 			processedProducts: 0,
 		},
-		tpPost: function(action, data, callback) {
+		tpPost: function(action, data, callbacks, enqueue) {
 			var xdata = $.extend({
 				action: 'tp_'+action,
 				_ajax_nonce: $('#tp_ajax_nonce').val()
 			}, data);
-			return $.post(ajaxurl, xdata, callback, "json");
+			return $.ajax($.extend({
+				type: "POST",
+				url: ajaxurl,
+				data: xdata,
+				dataType: "json",
+				enqueue: enqueue
+			},callbacks));
 		},
 		tpUpdateAll: function(target) {
 			target = $(target);
 			
-			target.html('');
+			target.html('Preparing to update...');
 			
 			$.tpPost(
-				'getProducts',
+				'getNumProducts',
 				{},
-				function(r){
-					if(r.responseStatus != 'ok') {
-						var log = $('<div />').attr('id','tp_updateall_log').addClass('tp-logger').tpLoggingBox({height:400}).appendTo(target);
-						log.tpLogError('Error updating product: '+r.error);
-						$.tpUpdateAllFinish();
-						return false;
-					}
-					
-					$.tpUpdateInfo.products = r.response.ids;
-					$.tpUpdateInfo.products.length = getObjectLength($.tpUpdateInfo.products);
-					$.tpUpdateInfo.processedProducts = 0;
-					$.tpUpdateInfo.successfullyProcessedProducts = 0;
-					
-					if($.tpUpdateInfo.products.length == 0) {
-						alert('No products found');
-						$.tpUpdateAllFinish();
-						return false;
-					}
-					
-					target.append(
-						$('<p />').html($.tpUpdateInfo.products.length+' products to update.')
-					).append(
-						$('<div />').attr('id','tp_updateall_progressbar').progressbar()
-					).append(
-						$('<div />').attr('id','tp_updateall_log').addClass('tp-logger').tpLoggingBox({height:400})
-					);
-					
-					for(k in $.tpUpdateInfo.products) {
-						if(k == 'length')
-							continue;
-						var pid = $.tpUpdateInfo.products[k];
-						$.tpPost(
-							'updateProduct',
-							{
-								post_id: pid
-							},
-							function(r,s,x){
-								var data = $.unserialize(this.data), _pid = data.post_id;
-								if(r.responseStatus == 'ok'){
-									var post_name = r.response.name || _pid;
-									$.tpUpdateInfo.successfullyProcessedProducts++;
-									if(r.response.errors)
-										for(j in r.response.errors){
-											$('#tp_updateall_log').tpLogWarning('Updating product '+post_name+': '+r.response.errors[j]);
-										}
-									$('#tp_updateall_log').tpLogMessage('Product '+post_name+' updated');
-								} else {
-									$('#tp_updateall_log').tpLogError('Error updating product: '+r.error);
-								}
-								$.tpUpdateInfo.processedProducts++;
-								$('#tp_updateall_progressbar').progressbar('option','value',parseInt(100*$.tpUpdateInfo.processedProducts/$.tpUpdateInfo.products.length))
-								if($.tpUpdateInfo.processedProducts == $.tpUpdateInfo.products.length) {
-									$.tpUpdateAllFinish();
-								}
-							}
+				{
+					success: function(r,s,x){
+						//console.log('getNumProducts',r);
+						target.html('');
+						if(r.responseStatus != 'ok') {
+							var log = $('<div />').attr('id','tp_updateall_log').addClass('tp-logger').tpLoggingBox({height:400}).appendTo(target);
+							log.tpLogError('Error getting number of products: '+r.error);
+							$.tpUpdateAllFinish();
+							return false;
+						}
+						
+						if(r.response.numProducts == 0) {
+							alert('No products found');
+							$.tpUpdateAllFinish();
+							return false;
+						}
+						
+						$.tpUpdateInfo.numProducts = parseInt(r.response.numProducts);
+						$.tpUpdateInfo.processedProducts = 0;
+						$.tpUpdateInfo.successfullyProcessedProducts = 0;
+						var perBatch = parseInt(r.response.perBatch);
+						
+						var log = $('<div />').attr('id','tp_updateall_log').addClass('tp-logger').tpLoggingBox({height:400});
+						
+						target.append(
+							$('<p />').html($.tpUpdateInfo.numProducts+' products to update.')
+						).append(
+							$('<div />').attr('id','tp_updateall_progressbar').progressbar()
+						).append(
+							log
 						);
+						
+						log.tpLogMessage('Update started');
+						
+						for(var i=0; i*perBatch<$.tpUpdateInfo.numProducts; i++) {
+							$.tpPost(
+								'getProducts',
+								{
+									page: i
+								},
+								{
+									success: function(r,s,x){
+//										console.log('getProducts',r, r.response.ids.length);
+										if(r.responseStatus != 'ok') {
+											log.tpLogError('Error updating product: '+r.error);
+											$.tpUpdateAllFinish();
+											return false;
+										}
+										
+										var products = r.response.ids;
+//										console.log(products.length);
+										
+										for(k in products) {
+											if(k == 'length')
+												continue;
+											var pid = products[k];
+											
+											$.tpPost(
+												'updateProduct',
+												{
+													post_id: pid
+												},
+												{
+													success: function(r,s,x) {
+														var data = $.unserialize(this.data), _pid = data.post_id;
+														if(r.responseStatus == 'ok') {
+															var post_name = r.response.name || _pid;
+															$.tpUpdateInfo.successfullyProcessedProducts++;
+															if(r.response.errors)
+																for(j in r.response.errors){
+																	$('#tp_updateall_log').tpLogWarning('Updating product '+post_name+': '+r.response.errors[j]);
+																}
+//															$('#tp_updateall_log').tpLogMessage('Product '+post_name+' updated');
+														} else {
+															$('#tp_updateall_log').tpLogError('Error updating product: '+r.error);
+														}
+														$.tpUpdateInfo.processedProducts++;
+														$('#tp_updateall_progressbar').progressbar('option','value',100*$.tpUpdateInfo.processedProducts/$.tpUpdateInfo.numProducts)
+														if($.tpUpdateInfo.processedProducts == $.tpUpdateInfo.numProducts) {
+															$.tpUpdateAllFinish();
+															//console.log(allProducts);
+														}
+													},
+													error: function() {
+														$.tpUpdateInfo.processedProducts++;
+														$('#tp_updateall_progressbar').progressbar('option','value',100*$.tpUpdateInfo.processedProducts/$.tpUpdateInfo.numProducts)
+														log.tpLogError('Connection/server error while updating product');
+														if($.tpUpdateInfo.processedProducts >= $.tpUpdateInfo.numProducts) {
+															$.tpUpdateAllFinish();
+														}
+														return false;
+													}
+												}
+											);
+										}
+									},
+									error: function(x) {
+										$.tpUpdateInfo.processedProducts+=perBatch;
+										$('#tp_updateall_progressbar').progressbar('option','value',100*$.tpUpdateInfo.processedProducts/$.tpUpdateInfo.numProducts)
+										log.tpLogError('Connection/server error while loading batch');
+										if($.tpUpdateInfo.processedProducts >= $.tpUpdateInfo.numProducts) {
+											$.tpUpdateAllFinish();
+										}
+										return false;
+									}
+								}
+							);
+						}
 					}
 				}
 			);
+			return false;
 		},
 		tpUpdateAllFinish: function(){
-			var message = 'All done! Successfully updated '+$.tpUpdateInfo.successfullyProcessedProducts+' out of '+$.tpUpdateInfo.products.length+' products.';
-			if($.tpUpdateInfo.successfullyProcessedProducts == $.tpUpdateInfo.products.length) {
+			var message = 'All done! Successfully updated '+$.tpUpdateInfo.successfullyProcessedProducts+' out of '+$.tpUpdateInfo.numProducts+' products.';
+			if($.tpUpdateInfo.successfullyProcessedProducts == $.tpUpdateInfo.numProducts) {
 				$('#tp_updateall_log').tpLogMessage(message);
 			} else {
 				$('#tp_updateall_log').tpLogWarning(message);

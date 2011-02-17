@@ -75,10 +75,17 @@ function TP_AJAX_wrapper_getNumProducts() {
 	$out = array();
 	
 	try {
-		$numposts = wp_count_posts( tp_get_post_type() );
+		global $wpdb;
+		
+		$perBatch = get_option( 'tp_options_add_feed', array('update_batch_size' => 50) );
+		$perBatch = isset($perBatch['update_batch_size']) ? $perBatch['update_batch_size'] : 50;
+		
+		$q = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->posts WHERE post_type = %s AND post_status IN ('publish', 'draft', 'pending') AND (SELECT COUNT(*) FROM $wpdb->postmeta WHERE post_id = ID AND meta_key = 'tp_product_ID' ) > 0;", tp_get_post_type());
+		$numposts = intval( $wpdb->get_var( $q ) );
 		
 		$res = array(
-			'numProducts' => $numposts->publish
+			'numProducts' => $numposts,
+			'perBatch' => $perBatch
 		);
 	} catch(Exception $e) {
 		$out['error'] = $e->getMessage();
@@ -98,28 +105,20 @@ function TP_AJAX_wrapper_getProducts() {
 	$out = array();
 	
 	try {
-		$prods = get_posts( array(
-			'type' => tp_get_post_type(),
-			'post_status' => array( 'publish', 'draft', 'pending' ),
-			'numberposts' => -1,
-		));
+		$page = ( isset( $_REQUEST['page'] ) && is_numeric( $_REQUEST['page'] ) ) ? $_REQUEST['page'] : 1;
+		$perBatch = get_option( 'tp_options_add_feed', array('update_batch_size' => 50) );
+		$perBatch = isset($perBatch['update_batch_size']) ? $perBatch['update_batch_size'] : 50;
+		
+		$prods = get_posts( 'type=' . tp_get_post_type() . '&post_status=publish,draft,pending&numberposts='.intval($perBatch).'&offset='.intval($page*$perBatch) );
+		$ids = array();
 		foreach ( $prods as $k => $v ) {
 			$t = get_post_meta( $v->ID, 'tp_product_info', true );
 			$ok = false;
-			if( is_array( $t ) ) {
-				foreach ( $t as $kk => $vv ) {
-					if ( ! ( is_array($vv) || empty($vv) ) ) {
-						$ok = true;
-					}
-				}
-			}
-			if ( $t && $t !== '' && $ok )
-				$prods[$k] = $v->ID;
-			else
-				unset($prods[$k]);
+			
+			$ids[] = $v->ID;
 		}
 		
-		$res = array ( 'ids' => $prods );
+		$res = array ( 'ids' => $ids );
 	} catch(Exception $e) {
 		$out['error'] = $e->getMessage();
 	}
@@ -200,7 +199,7 @@ function TP_AJAX_wrapper_updateProduct() {
 		if ( ! $live_product ) {
 			// Delete the post
 			wp_delete_post( $id );
-			throw new Exception( sprintf( __( 'Expired product: %1$s' ), tp_strtopinfo( '%brand% %title% (%id%)', $product ) ) );
+			throw new Exception( sprintf( __( 'Expired product: %1$s' ), ( $product ? tp_strtopinfo( '%brand% %title% (%id%)', $product ) : '' ) ) );
 		}
 		
 		$new_id = tp_add_product_from_feed( $product->id, $product->{'product-store-id'} );
@@ -219,8 +218,8 @@ function TP_AJAX_wrapper_updateProduct() {
 		$out['error'] = $e->getMessage();
 	}
 	
-	$out['responseStatus'] = $res ? 'ok' : 'null';
-	$out['response'] = $res;
+	$out['responseStatus'] = ( isset( $res ) && $res ) ? 'ok' : 'null';
+	$out['response'] = isset( $res ) ? $res : null;
 	
 	echo json_encode($out);
 	
@@ -278,6 +277,12 @@ $ajax_actions = array(
 foreach ( $ajax_actions as $action ) {
 	add_action ( 'wp_ajax_tp_'.$action, 'TP_AJAX_wrapper_' . $action );
 }
+
+//add_action('admin_init','tp_suppress_ajax_error', 5); // higher priority so that it catches all errors
+//function tp_suppress_ajax_error() {
+//	if( defined( 'DOING_AJAX' ) && DOING_AJAX && substr( $_REQUEST['action'], 0, 3 ) == 'tp_' )
+//		ob_start();
+//}
 
 endif;
 

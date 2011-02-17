@@ -41,6 +41,12 @@ function tp_register_settings() {
 						'publish' => 'Published'
 					),
 					'default' => 'draft'
+				),
+				'update_batch_size' => array(
+					'type' => 'text',
+					'label' => 'Update batch size',
+					'description' => 'The maximum number of products to update in a single step',
+					'default' => 50
 				)
 			)
 		),
@@ -96,7 +102,7 @@ function tp_register_settings() {
 		foreach ( $section['settings'] as $setting_id => $setting ) {
 			$setting['id'] = "tp_options_{$section_id}_{$setting_id}";
 			$setting['name'] = "tp_options_{$section_id}[{$setting_id}]";
-			$setting['value'] = isset( $values[$setting_id] ) ? $values[$setting_id] : ( $values[$setting_id] = $setting['default'] );
+			$setting['value'] = isset( $values[$setting_id] ) ? $values[$setting_id] : ( $values[$setting_id] = isset( $setting['default'] ) ? $setting['default'] : null );
 			add_settings_field( "tp_options_{$section_id}_{$setting_id}", __( $setting['label'], 'tppi' ), 'tp_render_field', 'tp-options', "tp_options_{$section_id}", $setting );			
 		}
 		if ( $defaults )
@@ -330,6 +336,7 @@ function tp_plugin_settings_help( $contextual_help, $screen_id, $screen ) {
 	<h3><?php _e( 'When adding from a feed', 'tppi' ); ?></h3>
 	<p><strong><?php _e( 'Destination post type', 'tppi' ); ?></strong> - <?php printf( __( 'Wordpress supports <a href="%1$s" target="_blank">Custom Post Types</a>, which you can use to create your own custom post type (e.g. %2$s) to import and show off products. Or you can opt for the built-in post types.', 'tppi' ), 'http://codex.wordpress.org/Custom_Post_Types', '<code>product</code>' ); ?></p>
 	<p><strong><?php _e( 'Default post status', 'tppi' ); ?></strong> - <?php _e( 'When you import a product from a feed you can have the destination post wait for you to publish it or you can immediately send it to your target audience.', 'tppi' ); ?></p>
+	<p><strong><?php _e( 'Update batch size', 'tppi' ); ?></strong> - <?php _e( 'When you are updating the products, loading too many at once could fill up your server memory. Therefore, you can select how many products should be updated at once by customizing this setting.', 'tppi' ); ?></p>
 	<h3><?php _e( 'Metadata to get when mass-importing', 'tppi' ); ?></h3>
 	<p><strong><?php _e( 'Product fields', 'tppi' ); ?></strong> - <?php printf( __('These are the fields you can use in your custom theme. The syntax is %1$s, where %2$s is the WordPress field name and %3$s is the value of the product info field from 2Performant.', 'tppi'), "<code>tp_the_product_field( 'wp-key' )</code>", '<code>wp-key</code>', '<code>%product-key%</code>' ); ?></p>
 	<p><strong><?php _e( 'Other custom fields', 'tppi' ); ?></strong> - <?php printf( __( '<a href="%1$s" target="_blank">Custom fields</a> that can originally be set by other plugins, but whose values you want to override. For example you could set %2$s\'s %3$s custom field to something like %4$s in order to get %5$s.', 'tppi'), 'http://codex.wordpress.org/Custom_Fields', "<a href='http://wordpress.org/extend/plugins/all-in-one-seo-pack/' target='_blank'>All in One SEO Pack</a>", '<code>_aioseop_description</code>', '<code>'.$desc.'</code>', '<em>'.$result.'</em>' ); ?></p>

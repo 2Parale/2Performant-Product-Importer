@@ -38,10 +38,14 @@ You have to manually display the product fields using the `tp_the_product_field(
 = Whoa! That product snippet looks totally awkward on my blog. You call that looking good? =
 Actually, no. But there's a reason for it: you can customize the output depending on your theme and imagination. Just go to the settings page and edit the output template.
 
+= I have a long list of imported products and for some reason when I update them all, the script never finishes. What should I do? =
+There's a bug/feature in Wordpress which gets in the way of the process. It's documented [here](http://core.trac.wordpress.org/ticket/11831). The quickfix is to add `define('ALTERNATE_WP_CRON', true);` to `wp-config.php`.
+
 == Changelog ==
 
 = 0.9.5 =
 * **Critical Bugfix** AJAX now works on environments which cannot use __callStatic (i.e. PHP <5.3)
+* **Bugfix** Product mass update now divided into batches of configurable size. This way, even when updating large lists of products, script will not fail.
 
 = 0.9.4 =
 * **Bugfix** Now shows failed updated in update log and displays summary when some products fail update.
@@ -61,6 +65,9 @@ Actually, no. But there's a reason for it: you can customize the output dependin
 * **Bugfix** Does not delete regular posts on update
 
 == Upgrade Notice ==
+
+= 0.9.5 =
+Hotfix for updating products in environments running PHP <5.3
 
 = 0.9.2 =
 Hotfix for environments running PHP <5.3
