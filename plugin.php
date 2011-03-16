@@ -90,8 +90,8 @@ function tp_get_the_product_field( $key, $id = false ) {
 	return isset( $t[$key] ) ? $t[$key] : '';
 }
 
-function tp_the_product_field( $key ) {
-	echo tp_get_the_product_field( $key );
+function tp_the_product_field( $key, $id = false ) {
+	echo tp_get_the_product_field( $key, $id );
 }
 
 // [tp_product id="id" feed="feed"]
