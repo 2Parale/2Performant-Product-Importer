@@ -18,7 +18,7 @@ define('TPPI_VERSION', 'v0.9.5');
 if ( is_admin() ) :
 
 add_action( 'admin_menu', 'tp_plugin_menu' );
-	
+
 function tp_plugin_menu() {
 	global $tp_plugin_settings_page;
 	$tp_plugin_settings_page = add_options_page( '2Performant Product Importer Settings', '2Performant Product Importer', 'manage_options', '2performant-product-importer', 'tp_plugin_settings' );
@@ -152,5 +152,22 @@ include_once 'add-from-feed.php';
 include_once 'toolbox.php';
 include_once 'listing.php';
 include_once 'edit-page-button.php';
+
+
+/**
+* Add Settings link to plugins page
+*/
+function tp_plugin_action_links($links, $file) {
+	if ($file == "2performant-product-importer/plugin.php") {
+		$settings_link = '<a href="' . get_bloginfo('wpurl') . '/wp-admin/options-general.php?page=2performant-product-importer">Settings</a>';
+		array_unshift($links, $settings_link);
+	}
+	return $links;
+}
+
+/**
+* Add the links to plugin action links filter.
+*/
+add_filter('plugin_action_links', 'tp_plugin_action_links', 10, 2);
 
 ?>
