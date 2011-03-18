@@ -46,6 +46,13 @@ function tp_product_info_inner_boxes() {
 	#tp_product_info .tp_product_field {
 		width: 98%;
 	}
+	.tp_product_note {
+		color:#EF9595;	
+	}
+	.tp_product_undo {
+		display:none;
+		color:#7DDFA6;
+	}
 	</style>
 <?php
 	
@@ -56,25 +63,41 @@ function tp_product_info_inner_boxes() {
 	$info_fields = $info_fields['fields'];
 	
 	$pm = get_post_meta( $post->ID, 'tp_product_info', true );
-//	var_dump($pm);
-	
+	$pAPI = tp_get_post_product_data( $post->ID );
+
 	echo "<dl>";
+	?>
+	<?php 
 	// The actual fields for data entry
 	foreach ( $info_fields as $name => $var ) {
-//		var_dump($name, $pm[$name]);
+		
+		$pAPI_value = tp_strtopinfo( $var['value'] , $pAPI );
+		
 		$var['value'] = isset( $pm[$name] ) ? $pm[$name] : '';
+		$var['value'] = htmlspecialchars_decode ( trim( $var['value'] ) );
+		$pAPI_value = htmlspecialchars_decode ( trim( $pAPI_value ) );
+		
 		$type = 'text';
 		if ( isset( $var['type'] ) ) {
 			$type = $var['type'];
 		}
+		
 ?><dt><label for="tp_product_<?php echo $name; ?>"><?php echo $var['label']; ?></label></dt><dd>
 <?php
+	$tp_hidden = ( $var['value'] != $pAPI_value ) ? '':'hidden';
+	
+	echo '<p id="note_'.$name.'" class="tp_product_note '.$tp_hidden.'"><strong>Note:</strong> This field was modified by you and will not be updated when you push the "UPDATE ALL" button from Toolbox. <a href="#" rel="'.$name.'" class="tp_product_revert" title="Revert to initial value got it from API">Revert &raquo;</a></p>';
+	echo '<p id="undo_'.$name.'" class="tp_product_undo">You can Undo until you leave this page: <a href="#" class="tp_undo_revert" rel="'.$name.'" title="Undo reverted value">Undo</a></p>';
+	?>
+	<input type="hidden" id="tp_hidden_product_<?php echo $name; ?>" value="<?php echo $pAPI_value; ?>" />
+	<input type="hidden" id="tp_modified_product_<?php echo $name; ?>" value="<?php echo $var['value']; ?>" />
+	<?php
 	switch($type) {
 		case 'text':
-?><input type="text" class="tp_product_field" id="tp_product_<?php echo $name; ?>" name="tp_product_<?php echo $name; ?>" value="<?php echo $var['value']; ?>" /><?php
+?><input type="text" class="tp_product_field" rel="<?php echo $name; ?>" id="tp_product_<?php echo $name; ?>" name="tp_product_<?php echo $name; ?>" value="<?php echo $var['value']; ?>" /><?php
 			break;
 		case 'textarea':
-?><textarea class="tp_product_field" id="tp_product_<?php echo $name; ?>" name="tp_product_<?php echo $name; ?>" cols="40" rows="15"><?php echo $var['value']; ?></textarea><?php
+?><textarea class="tp_product_field" rel="<?php echo $name; ?>" id="tp_product_<?php echo $name; ?>" name="tp_product_<?php echo $name; ?>" cols="40" rows="15"><?php echo $var['value']; ?></textarea><?php
 			break;
 	}
 ?>
@@ -112,7 +135,7 @@ function tp_save_productdata( $post_id ) {
 	$info_fields = get_option( 'tp_options_fields' );
 	$info_fields = $info_fields['fields'];
 	
-	$pm = get_post_meta( $post_id, 'tp_product_info' );
+	$pm = get_post_meta( $post_id, 'tp_product_info', true );
 	
 	foreach ( $info_fields as $name => $var ) {
 		if ( isset($_POST['tp_product_'.$name] ) ) {
