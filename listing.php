@@ -8,7 +8,6 @@ $th_hook = ( $pt == 'post' || $pt == 'page' ) ? "manage_{$pt}s_columns" : "manag
 
 add_filter( $th_hook, 'tp_manage_post_table_header' );
 function tp_manage_post_table_header( $defaults ) {
-	unset( $defaults['comments'], $defaults['author'] );
 //	$defaults['tp_updated'] = __( 'Updated', 'tppi' );
 	$defaults['tp_price'] = __( 'Price', 'tppi' );
 	if ( function_exists( 'get_the_post_thumbnail' ) ) {
@@ -42,8 +41,8 @@ function tp_custom_columns( $column, $id ) {
 	}
 }
 
-add_action( 'admin_enqueue_scripts', 'my_enqueue', 10, 1 );
-function my_enqueue( $hook ) {
+add_action( 'admin_enqueue_scripts', 'tp_listing_enqueue', 10, 1 );
+function tp_listing_enqueue( $hook ) {
 	if ( $hook == 'edit.php' ) {
 		wp_enqueue_script( 'tp-listing-script' );
 	}
