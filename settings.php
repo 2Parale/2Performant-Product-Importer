@@ -3,24 +3,6 @@ if ( is_admin() ) :
 
 function tp_register_settings() {
 	$settings = array(
-		'connection' => array(
-			'label' => 'Connection settings',
-			'settings' => array(
-				'network' => array(
-					'type' => 'text',
-					'label' => 'Network API URL',
-					'description' => 'E.g. <code>http://api.network.com</code>'
-				),
-				'username' => array(
-					'type' => 'text',
-					'label' => 'Username'
-				),
-				'password' => array(
-					'type' => 'password',
-					'label' => 'Password'
-				)
-			)
-		),
 		'add_feed' => array(
 			'label' => 'When adding from a feed',
 			'settings' => array(
@@ -85,6 +67,57 @@ function tp_register_settings() {
 </div>'
 				)
 			)
+		),
+		'connection' => array(
+			'label' => 'Connection settings',
+			'settings' => array(
+				'network' => array(
+					'type' => 'text',
+					'label' => 'Network API URL',
+					'description' => 'E.g. http://api.network.com'
+				),
+				'username' => array(
+					'type' => 'text',
+					'label' => 'Username'
+				),
+				'password' => array(
+					'type' => 'password',
+					'label' => 'Password'
+				),
+				'connection_timeout' => array(
+					'type' => 'text',
+					'label' => 'Connection timeout',
+					'description' => 'Time, in seconds, after which the connection to the API server is abandoned. Do not change unless you know what you are doing.',
+					'default' => 10
+				),
+				'timeout' => array(
+					'type' => 'text',
+					'label' => 'Transfer timeout',
+					'description' => 'Total number of seconds each API request can take. Use 0 for no limit, should be greater than connection timeout if set. Do not change unless you know what you are doing.',
+					'default' => 0
+				),
+				'adapter' => array(
+					'type' => 'select',
+					'label' => 'Connection adapter',
+					'description' => 'The connection adapter class. Do not change unless you know what you are doing.',
+					'options' => array(
+						'curl' => 'cURL',
+						'socket' => 'Socket',
+						'mock' => 'Mock'
+					),
+					'default' => 'socket'
+				)
+			)
+		),
+		'cache' => array(
+			'label' => 'Caching settings',
+			'settings' => array(
+				'enabled' => array(
+					'type' => 'checkbox',
+					'label' => 'Enable caching',
+					'description' => 'Enable via a third party persistent object caching plugin such as W3 Total Cache'
+				)
+			)
 		)
 	);
 	
@@ -140,6 +173,10 @@ function tp_render_field( $setting ) {
 			$class = array_merge( array ( 'large-text', 'code' ), $class );
 			$class = implode( ' ', $class );
 			$output = "<textarea rows='10' cols='50' class='" . esc_attr( $class ) . "' name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "'>" . esc_attr( $value ) . "</textarea>";
+			break;
+		case 'checkbox':
+			$class = implode( ' ', $class );
+			$output = "<input type='checkbox' class='" . esc_attr( $class ) . "' name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "' ".((boolean)($value) ? "checked='checked'" : "")." />";
 			break;
 		case 'custom':
 			if ( isset( $callback ) ) {
@@ -288,6 +325,8 @@ function tp_plugin_settings() {
 	}
 	
 	$errors = tp_verify_connection();
+	if( tp_using_cache() )
+		$errors += tp_verify_cache();
 	
 ?>
 <style type="text/css">
@@ -330,9 +369,6 @@ function tp_plugin_settings_help( $contextual_help, $screen_id, $screen ) {
 	
 ?>
 	<p><?php _e( 'This is your command center for the 2Performant Product Importer.' ); ?></p>
-	<h3><?php _e( 'Connection settings', 'tppi' ); ?></h3>
-	<p><strong><?php _e( 'Network API URL', 'tppi' ); ?></strong> - <?php printf( __( 'If you\'re unsure, ask your affiliate network operator for this. It\'s usually %1$s, where %2$s is your network.', 'tppi' ), '<code>api.network.com</code>', '<code>network.com</code>' ); ?></p>
-	<p><strong><?php _e( 'Username', 'tppi' ); ?> &amp; <?php _e( 'Password', 'tppi' ); ?></strong> - <?php _e( 'Self explanatory.', 'tppi' ); ?></p>
 	<h3><?php _e( 'When adding from a feed', 'tppi' ); ?></h3>
 	<p><strong><?php _e( 'Destination post type', 'tppi' ); ?></strong> - <?php printf( __( 'Wordpress supports <a href="%1$s" target="_blank">Custom Post Types</a>, which you can use to create your own custom post type (e.g. %2$s) to import and show off products. Or you can opt for the built-in post types.', 'tppi' ), 'http://codex.wordpress.org/Custom_Post_Types', '<code>product</code>' ); ?></p>
 	<p><strong><?php _e( 'Default post status', 'tppi' ); ?></strong> - <?php _e( 'When you import a product from a feed you can have the destination post wait for you to publish it or you can immediately send it to your target audience.', 'tppi' ); ?></p>
@@ -343,7 +379,16 @@ function tp_plugin_settings_help( $contextual_help, $screen_id, $screen ) {
 	<p><?php echo sprintf( __('Possible product info fields are: %1$s.', 'tppi'), '<code>%' . implode( '%</code>, <code>%', $field_names ) . '%</code>' ); ?></p>
 	<h3><?php _e( 'Inserting products into post', 'tppi' ); ?></h3>
 	<p><strong><?php _e( 'User-defined output template', 'tppi' ); ?></strong> - <?php printf( __('This defines how the products inserted into the post via the button on the <abbr title="What You See Is What You Get">WYSIWYG</abbr> (visual) editor will look like. You can use the product info fields mentioned above using the %1$s syntax described above.', 'tppi'), '<code>%product-info-field%</code>' ); ?></p>
+	<h3><?php _e( 'Connection settings', 'tppi' ); ?></h3>
+	<p><strong><?php _e( 'Network API URL', 'tppi' ); ?></strong> - <?php printf( __( 'If you\'re unsure, ask your affiliate network operator for this. It\'s usually %1$s, where %2$s is your network.', 'tppi' ), '<code>api.network.com</code>', '<code>network.com</code>' ); ?></p>
+	<p><strong><?php _e( 'Username', 'tppi' ); ?> &amp; <?php _e( 'Password', 'tppi' ); ?></strong> - <?php _e( 'Self explanatory.', 'tppi' ); ?></p>
+	<p><strong><?php _e( 'Connection timeout', 'tppi' ); ?> &amp; <?php _e( 'Transfer timeout', 'tppi' ); ?></strong> - <?php _e( 'The amount of time, in seconds, after which the connection to the API server and the data transfer from the API server respectively should be dropped. If you don\'t know what this means, you should probably stick to the default values.', 'tppi' ); ?></p>
+	<p><strong><?php _e( 'Connection adapter', 'tppi' ); ?></strong> - <?php _e( 'Which HTTP client implementation to use when connecting to the API server.', 'tppi' ); ?></p>
+	<h3><?php _e( 'Connection settings', 'tppi' ); ?></h3>
+	<p><strong><?php _e( 'Enable caching', 'tppi' ); ?></strong> - <?php printf( __( 'Whether to use a persistent object caching mechanism provided by another plugin, in order to speed up repetitive requests to the API server, such as getting the available feed list. %1$s is an excellent choice for the matter at hand.', 'tppi' ), '<a href="http://wordpress.org/extend/plugins/w3-total-cache/" target="_blank">W3 Total Cache</a>' ); ?></p>
+	<p></p>
 	<p><strong><?php _e( 'For more information' ); ?></strong></p>
+	
 <?php
 	
 	$contextual_help = ob_get_contents() . $contextual_help;

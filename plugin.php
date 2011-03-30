@@ -170,4 +170,23 @@ function tp_plugin_action_links($links, $file) {
 */
 add_filter('plugin_action_links', 'tp_plugin_action_links', 10, 2);
 
+/**
+* Add caching check logic.
+*/
+add_filter('query_vars','tp_add_cache_trigger');
+function tp_add_cache_trigger($vars) {
+	$vars[] = 'tp_checkcache';
+	return $vars;
+}
+
+add_action('template_redirect', 'tp_cache_trigger_check');
+function tp_cache_trigger_check() {
+	if(get_query_var('tp_checkcache') == 'true') {
+		include_once 'api.php';
+		$res = tp_cache_get( 'tp_testdata' );
+		echo $res ? $res : 'no';
+		exit;
+	}
+}
+
 ?>

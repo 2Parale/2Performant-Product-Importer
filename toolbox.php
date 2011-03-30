@@ -3,8 +3,14 @@
 if ( is_admin() ) :
 
 function tp_product_toolbox() {
+	$errors = array();
+	
 	$tp = false;
-	$errors = tp_verify_connection( $tp );
+	try {
+		$tp = tp_get_wrapper();
+	} catch(Exception $e) {
+		$errors[] = $e->getMessage();
+	}
 	
 ?><div class="wrap">
 	<?php if ( function_exists( 'screen_icon' ) ) screen_icon(); ?><h2>2Performant Product Toolbox</h2>

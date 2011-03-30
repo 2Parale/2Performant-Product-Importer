@@ -11,7 +11,11 @@ function tp_product_add_from_feed() {
 	}
 	
 	$tp = false;
-	$errors = tp_verify_connection( $tp );
+	try {
+		$tp = tp_get_wrapper();
+	} catch(Exception $e) {
+		$errors[] = $e->getMessage();
+	}
 	
 ?><div class="wrap">
 	<?php if ( function_exists( 'screen_icon' ) ) screen_icon(); ?><h2>2Performant Product Importer</h2>
@@ -29,7 +33,7 @@ function tp_product_add_from_feed() {
 <?php else : ?>
 	<!-- Habebum connectorum! -->
 <?php
-	
+	try {
 	$products = array();
 	$campaignID = 'approved';
 	$feedID = 'all';
@@ -105,6 +109,11 @@ function tp_product_add_from_feed() {
 			<?php endif; ?>
 		</div>
 	</div>
+<?php } catch(Exception $e) { ?>
+	<div id="setting-error-options_error" class="error settings-error">
+		<p><?php _e(gettype($e) . ': ' . $e->getMessage(), 'tppi'); ?></p>
+	</div>
+<?php } ?>
 </div><?php
 	endif;
 }

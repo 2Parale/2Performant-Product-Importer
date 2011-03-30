@@ -19,21 +19,24 @@ require_once 'Exceptions/Exceptions.php';
 
 class TPerformant {
 	
-	var $username;
-	var $password;
+        var $username;
+        var $password;
         var $host;
         var $version = "v1.0";
         var $auth_type;
         var $oauth;
         var $oauthRequest;
+        var $config = array();
 	
-	function TPerformant($auth_type, $auth_obj, $host) {
+	function TPerformant($auth_type, $auth_obj, $host, $config = array()) {
+	            $this->config = $config;
                 if ($auth_type == 'simple') {
-					$this->username = $auth_obj['user'];
-					$this->password = $auth_obj['pass'];
+                    $this->username = $auth_obj['user'];
+                    $this->password = $auth_obj['pass'];
                 } elseif ($auth_type == 'oauth') {
                     $this->oauth = $auth_obj;
                     $this->oauthRequest = new HTTP_Request2;
+                    if( isset($config['HTTP_Request2_config']) ) $this->oauthRequest->setConfig($config['HTTP_Request2_config']);
                     $this->oauthRequest->setHeader('Content-type: text/xml; charset=utf-8');
                 } else {
                     return false;
@@ -837,7 +840,7 @@ class TPerformant {
 		
 
 		if(isset($returned->error)){
-			throw new TPException($returned->error);
+			throw new TPException('API error reponse: ' . $returned->error);
 		}
 			
 		$placement = $expected;
@@ -867,7 +870,8 @@ class TPerformant {
 
         function simpleHttpRequest($url, $params, $method) {
                 $req = new HTTP_Request2($url, $method);
-
+                $req->setConfig($this->config['HTTP_Request2_config']);
+                
                 //authorize
                 $req->setAuth($this->username, $this->password);
 
@@ -884,9 +888,12 @@ class TPerformant {
                 $response = $req->send();
 
                 if (PEAR::isError($response)) {
-                        return $response->getMessage();
+                        throw new TPException($response->getMessage());
                 } else {
-                        return $response->getBody();
+                	if(intval($response->getStatus()) < 200 || intval($response->getStatus()) >= 300) {
+                		throw new TPException('Unavailable server. Response code: '.$response->getStatus().' (' .$response->getReasonPhrase(). ')');
+                	}
+                	return $response->getBody();
                 }
         }
 
@@ -896,6 +903,7 @@ class TPerformant {
                 //set the headers
                 $this->oauthRequest->setHeader("Accept", "application/xml");
                 $this->oauthRequest->setHeader("Content-Type", "application/xml");
+                $this->oauthRequest->setConfig($this->config['HTTP_Request2_config']);
 
                 if ($params) {
                         //serialize the data
@@ -906,7 +914,15 @@ class TPerformant {
                 }
                 
                 $response = $this->oauth->sendRequest($url, array(), $method);
-                return $response->getBody();
+                
+                if (PEAR::isError($response)) {
+                        throw new TPException($response->getMessage());
+                } else {
+                	if(intval($response->getStatus()) < 200 || intval($response->getStatus()) >= 300) {
+                		throw new TPException('Unavailable server. Response code: '.$response->getStatus().' (' .$response->getReasonPhrase(). ')');
+                	}
+                	return $response->getBody();
+                }
         }
 
 	function serialize($data) {
@@ -922,8 +938,11 @@ class TPerformant {
 	function unserialize($xml) {
 		$options = array (XML_UNSERIALIZER_OPTION_COMPLEXTYPE => 'object');
 		$unserializer = new XML_Unserializer($options);
-		$status = $unserializer->unserialize($xml); 
-	    $data = (PEAR::isError($status))?$status->getMessage():$unserializer->getUnserializedData();
+		$status = $unserializer->unserialize($xml);
+		if(PEAR::isError($status)) {
+			throw new TPException('Unserializer error: ' . $status->getMessage());
+		}
+	    $data = $unserializer->getUnserializedData();
 		return $data;
 	}
 }
