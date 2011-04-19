@@ -2,6 +2,10 @@
 
 function tp_strtopinfo( $str, $info ) {
 	foreach ( $info as $var => $value ) {
+		if( is_object( $value ) && !is_callable( array( $value, '__toString' ) ) )
+			continue;
+		if( is_array( $value ) )
+			$value = implode(',', $value);
 		$str = str_replace( "%{$var}%", esc_attr( $value ), $str );
 	}
 	
@@ -172,29 +176,44 @@ function tp_check_product_outdated( $product, $post = null ) {
 //	return $errors;
 }
 
-function tp_get_post_product_data( $post_id ) {
-	// base64 encoding for unserialize bug if string contains ';' - details http://davidwalsh.name/php-serialize-unserialize-issues
-	$data = get_post_meta( $post_id, 'tp_product_data', true );
-	if ( $data === '' )
-		return false;
-	$data = unserialize( base64_decode( $data ) );
-	
-	foreach ( $data as $property => $value ) {
-		$data->$property = base64_decode( $value );
+function tp_decode_product_data( $data ) {
+	$data = base64_decode( $data );
+	if( ( unserialize( $data ) !== FALSE ) && ( is_object( unserialize( $data ) ) || is_array( unserialize( $data ) ) ) ) {
+		$data = unserialize( $data );
+		foreach( $data as $k => $v ) {
+			if( is_object($data) )
+				$data->$k = tp_decode_product_data( $v );
+			else
+				$data[$k] = tp_decode_product_data( $v );
+		}
 	}
 	
 	return $data;
 }
 
-function tp_set_post_product_data( $post_id, $product ) {
-	// base64 encoding for unserialize bug if string contains ';' - details http://davidwalsh.name/php-serialize-unserialize-issues
-	$data = new stdClass();
-	foreach ( $product as $property => $value ) {
-		$data->$property = base64_encode( $value );
+function tp_encode_product_data( $data ) {
+	if( is_object( $data ) || is_array( $data ) ) {
+		foreach( $data as $k => $v ) {
+			if( is_object($data) )
+				$data->$k = tp_encode_product_data( $v );
+			else
+				$data[$k] = tp_encode_product_data( $v );
+		}
+		$data = serialize( $data );
 	}
 	
-	$data = base64_encode( serialize( $data ) );
-	return update_post_meta( $post_id, 'tp_product_data', $data );
+	return base64_encode( $data );
+}
+
+function tp_get_post_product_data( $post_id ) {
+	$data = get_post_meta( $post_id, 'tp_product_data', true );
+	if ( $data === '' )
+		return false;
+	return tp_decode_product_data( $data );
+}
+
+function tp_set_post_product_data( $post_id, $product ) {
+	return update_post_meta( $post_id, 'tp_product_data', tp_encode_product_data( $data ) );
 }
 
 function tp_set_post_meta( $id, $pinfo, $preserve = false ) {

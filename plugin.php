@@ -3,7 +3,7 @@
 Plugin Name: 2Performant Product Importer
 Plugin URI: http://blog.2parale.ro/wp-plugin-2performant-product-importer-en/
 Description: Imports products from product feeds in 2Performant affiliate networks. It requires authentication as an affiliate in one of these networks. Products are imported as individual posts (or other custom post types, configurable) which can use several custom fields based on product info from the feeds. 
-Version: 0.9.5
+Version: 0.9.6
 Author: 2Parale
 Author URI: http://www.2parale.ro/
 License: GPL2
@@ -13,12 +13,12 @@ License: GPL2
 //error_reporting(E_ALL);
 //define('SCRIPT_DEBUG', true);
 
-define('TPPI_VERSION', 'v0.9.5');
+define('TPPI_VERSION', 'v0.9.6');
 
 if ( is_admin() ) :
 
 add_action( 'admin_menu', 'tp_plugin_menu' );
-	
+
 function tp_plugin_menu() {
 	global $tp_plugin_settings_page;
 	$tp_plugin_settings_page = add_options_page( '2Performant Product Importer Settings', '2Performant Product Importer', 'manage_options', '2performant-product-importer', 'tp_plugin_settings' );
@@ -90,8 +90,8 @@ function tp_get_the_product_field( $key, $id = false ) {
 	return isset( $t[$key] ) ? $t[$key] : '';
 }
 
-function tp_the_product_field( $key ) {
-	echo tp_get_the_product_field( $key );
+function tp_the_product_field( $key, $id = false ) {
+	echo tp_get_the_product_field( $key, $id );
 }
 
 // [tp_product id="id" feed="feed"]
