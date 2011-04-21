@@ -56,7 +56,7 @@ function tp_add_product_from_feed( $id, $feed, $category = array() ) {
 			$errors[] = 'Error adding/updating product';
 			
 		update_post_meta( $ok, 'tp_product_ID', $id );
-		tp_set_post_product_data( $ok, $pinfo );
+		tp_set_post_product_data( $ok, clone $pinfo );
 		tp_set_post_meta( $ok, $pinfo, ( $func == 'wp_update_post' ) );
 		
 		if( $func == 'wp_insert_post' && $pinfo->{'image-url'} )
@@ -213,7 +213,7 @@ function tp_get_post_product_data( $post_id ) {
 }
 
 function tp_set_post_product_data( $post_id, $product ) {
-	return update_post_meta( $post_id, 'tp_product_data', tp_encode_product_data( $data ) );
+	return update_post_meta( $post_id, 'tp_product_data', tp_encode_product_data( $product ) );
 }
 
 function tp_set_post_meta( $id, $pinfo, $preserve = false ) {

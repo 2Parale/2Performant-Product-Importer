@@ -109,7 +109,7 @@ function TP_AJAX_wrapper_getProducts() {
 		$perBatch = get_option( 'tp_options_add_feed', array('update_batch_size' => 50) );
 		$perBatch = isset($perBatch['update_batch_size']) ? $perBatch['update_batch_size'] : 50;
 		
-		$prods = get_posts( 'type=' . tp_get_post_type() . '&post_status=publish,draft,pending&numberposts='.intval($perBatch).'&offset='.intval($page*$perBatch) );
+		$prods = get_posts( 'type=' . tp_get_post_type() . '&post_status=publish,draft,pending&meta_key=tp_product_ID&numberposts='.intval($perBatch).'&offset='.intval($page*$perBatch) );
 		$ids = array();
 		foreach ( $prods as $k => $v ) {
 			$t = get_post_meta( $v->ID, 'tp_product_info', true );
@@ -185,6 +185,8 @@ function TP_AJAX_wrapper_updateProduct() {
 			throw new Exception( sprintf( __( 'Invalid post ID: %1$s' ), $id ) );
 		
 		$product = tp_get_post_product_data( $id );
+		if( empty($product->{'product-store-id'}) || empty($product->id) )
+			throw new Exception( sprintf( __('Invalid attached product data for post %d'), $id ) );
 		
 		try {
 			require_once 'api.php';
@@ -197,8 +199,10 @@ function TP_AJAX_wrapper_updateProduct() {
 		}
 		
 		if ( ! $live_product ) {
-			// Delete the post
-			wp_delete_post( $id );
+			if( tp_get_option( 'add_feed', 'trash_expired', true ) ) {
+				// Delete the post
+				wp_delete_post( $id );
+			}
 			throw new Exception( sprintf( __( 'Expired product: %1$s' ), ( $product ? tp_strtopinfo( '%brand% %title% (%id%)', $product ) : '' ) ) );
 		}
 		
