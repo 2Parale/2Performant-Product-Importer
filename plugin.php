@@ -3,7 +3,7 @@
 Plugin Name: 2Performant Product Importer
 Plugin URI: http://blog.2parale.ro/wp-plugin-2performant-product-importer-en/
 Description: Imports products from product feeds in 2Performant affiliate networks. It requires authentication as an affiliate in one of these networks. Products are imported as individual posts (or other custom post types, configurable) which can use several custom fields based on product info from the feeds. 
-Version: 0.9.7b
+Version: 0.9.6
 Author: 2Parale
 Author URI: http://www.2parale.ro/
 License: GPL2
@@ -13,7 +13,7 @@ License: GPL2
 //error_reporting(E_ALL);
 //define('SCRIPT_DEBUG', true);
 
-define('TPPI_VERSION', 'v0.9.7b');
+define('TPPI_VERSION', 'v0.9.6');
 
 if ( is_admin() ) :
 
@@ -152,41 +152,5 @@ include_once 'add-from-feed.php';
 include_once 'toolbox.php';
 include_once 'listing.php';
 include_once 'edit-page-button.php';
-
-
-/**
-* Add Settings link to plugins page
-*/
-function tp_plugin_action_links($links, $file) {
-	if ($file == "2performant-product-importer/plugin.php") {
-		$settings_link = '<a href="' . get_bloginfo('wpurl') . '/wp-admin/options-general.php?page=2performant-product-importer">Settings</a>';
-		array_unshift($links, $settings_link);
-	}
-	return $links;
-}
-
-/**
-* Add the links to plugin action links filter.
-*/
-add_filter('plugin_action_links', 'tp_plugin_action_links', 10, 2);
-
-/**
-* Add caching check logic.
-*/
-add_filter('query_vars','tp_add_cache_trigger');
-function tp_add_cache_trigger($vars) {
-	$vars[] = 'tp_checkcache';
-	return $vars;
-}
-
-add_action('template_redirect', 'tp_cache_trigger_check');
-function tp_cache_trigger_check() {
-	if(get_query_var('tp_checkcache') == 'true') {
-		include_once 'api.php';
-		$res = tp_cache_get( 'tp_testdata' );
-		echo $res ? $res : 'no';
-		exit;
-	}
-}
 
 ?>

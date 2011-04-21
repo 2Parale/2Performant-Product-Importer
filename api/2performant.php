@@ -1,42 +1,34 @@
 <?php
 /* ================================
    2Performant.com Network API 
-   ver. 0.3.0
+   ver. 0.2.5
    http://help.2performant.com/API
    ================================ */
-
-ini_set(
-  'include_path',
-  ini_get( 'include_path' ) . PATH_SEPARATOR . "2pphp/PEAR/" . PATH_SEPARATOR . "2pphp/" . PATH_SEPARATOR . "PEAR/"
-);
 
 require_once 'HTTP/Request2.php';
 require_once 'XML/Serializer.php';
 require_once 'XML/Unserializer.php';
 require_once 'HTTP/OAuth.php';
 require_once 'HTTP/OAuth/Consumer.php';
-require_once 'Exceptions/Exceptions.php';
 
 class TPerformant {
 	
-        var $username;
-        var $password;
+	var $user;
+	var $pass;
         var $host;
         var $version = "v1.0";
         var $auth_type;
         var $oauth;
         var $oauthRequest;
-        var $config = array();
 	
-	function TPerformant($auth_type, $auth_obj, $host, $config = array()) {
-	            $this->config = $config;
+	function TPerformant($auth_type, $auth_obj, $host) {
                 if ($auth_type == 'simple') {
-                    $this->username = $auth_obj['user'];
-                    $this->password = $auth_obj['pass'];
+    		    $this->user = $auth_obj['user'];
+		    $this->pass = $auth_obj['pass'];
                 } elseif ($auth_type == 'oauth') {
                     $this->oauth = $auth_obj;
+
                     $this->oauthRequest = new HTTP_Request2;
-                    if( isset($config['HTTP_Request2_config']) ) $this->oauthRequest->setConfig($config['HTTP_Request2_config']);
                     $this->oauthRequest->setHeader('Content-type: text/xml; charset=utf-8');
                 } else {
                     return false;
@@ -52,26 +44,13 @@ class TPerformant {
 
         /* Display public information about a user */
         function user_show($user_id) {
-					return $this->hook("/users/{$user_id}.xml", "user");;
+                return $this->hook("/users/{$user_id}.xml", "user");
         }
 
         /* Display public information about the logged in user */
-        function user_loggedin() {
-                return $this->hook("/users/loggedin.xml", "user");
-        }
-
-        /* Create a new User */
-        function user_create($user, $user_info, $fast_activation = 0) {
-                if (!$user)
-                  $user = array();
-
-                $user['fast_activation'] = $fast_activation;
-
-                $request['user'] = $user;
-		$request['user_info'] = $user_info;
-
-                return $this->hook("/users.xml", "user", $request, 'POST');
-        }
+function user_loggedin() {
+	return $this->hook("/users/loggedin.xml", "user");
+}
 
         /*===========*/
         /* Campaigns */
@@ -166,9 +145,9 @@ class TPerformant {
         }
 
         /* Merchants: List affiliates approved in campaigns */
-	function affiliates_listforadvertiser($campaign_id=null) {
+	function affiliates_listformerchant($campaign_id=null) {
 		$request['campaign_id'] = $campaign_id;
-                return $this->hook("/affiliates/listforadvertiser", "user", $request, 'GET');
+                return $this->hook("/affiliates/listformerchant", "user", $request, 'GET');
         } 
        
         /*=============*/
@@ -191,12 +170,12 @@ class TPerformant {
         }
 
         /* Merchants: List commissions on campaigns. Month: 01 to 12; Year: 20xx. */
-        function commissions_listforadvertiser($campaign_id, $month, $year) {
+        function commissions_listformerchant($campaign_id, $month, $year) {
                 $request['campaign_id'] = $campaign_id;
 		$request['month']       = $month;
                 $request['year']        = $year;
 
-                return $this->hook("/commissions/listforadvertiser.xml", "campaign", $request, 'GET');
+                return $this->hook("/commissions/listformerchant.xml", "campaign", $request, 'GET');
         }
 
         /* Affiliates: List commissions on campaigns. Month: 01 to 12; Year: 20xx. */
@@ -344,6 +323,7 @@ class TPerformant {
         */
         function txtad_create($campaign_id, $txtad) {
                 $request['txtad'] = $txtad;
+        
                 return $this->hook("/campaigns/{$campaign_id}/txtads.xml", "txtad", $request, 'POST');
         }
 
@@ -595,218 +575,6 @@ class TPerformant {
                 return $this->hook("/messages/{$message_id}.xml", "message", null, 'DELETE');
         }
 
-        /*=================================*/
-        /*        ADMIN FUNCTIONS          */
-        /*=================================*/
-
-
-        /*====================*/
-        /* Affiliate Invoices */
-        /*====================*/
-
-        /* List Affiliate Invoices. Displays the first 15 entries by default. */
-        function admin_affiliate_invoices_list($page=1, $perpage=15) {
-                $request['page']        = $page;
-                $request['perpage']     = $perpage;
-
-                return $this->hook("/users/all/affiliate_invoices.xml", "affiliate-invoice", $request, 'GET');
-        }
-
-        /* Search for Affiliate Invoices */
-        function admin_affiliate_invoices_search($search, $page=1, $perpage=15) {
-                $request['page']    = $page;
-                $request['perpage'] = $perpage;
-                $request['search']  = $search;
-
-                return $this->hook("/affiliate_invoices/search.xml", "affiliate-invoice", $request, 'POST');
-        }
-
-        /* Create an Affiliate Invoice */
-        function admin_affiliate_invoice_create($user_id, $affiliate_invoice, $commissions, $taxes) {
-                $request['affiliate_invoice'] = $affiliate_invoice;
-                $request['commissions'] = $commissions;
-                $request['taxes'] = $taxes;
-
-                return $this->hook("/users/$user_id/affiliate_invoices.xml", "affiliate-invoice", $request, 'POST');
-        }      
- 
-        /* Update an Affiliate Invoice */      
-        function admin_affiliate_invoice_update($user_id, $affiliate_invoice_id, $affiliate_invoice, $taxes=null) {
-                $request['affiliate_invoice'] = $affiliate_invoice;
-                $request['taxes'] = $taxes;
-
-                return $this->hook("/users/$user_id/affiliate_invoices/$affiliate_invoice_id.xml", "affiliate-invoice", $request, 'PUT');
-        }
-
-        /* Destroy an Affiliate Invoice */
-        function admin_affiliate_invoice_destroy($user_id, $affiliate_invoice_id) {
-                return $this->hook("/users/$user_id/affiliate_invoices/$affiliate_invoice_id.xml", "affiliate-invoice", null, 'DELETE');
-        }
-
-        /*=====================*/
-        /* Advertiser Invoices */
-        /*=====================*/
-
-        /* List Advertiser Invoices. Displays the first 15 entries by default. */
-        function admin_advertiser_invoices_list($page=1, $perpage=15) {
-                $request['page']        = $page;
-                $request['perpage']     = $perpage;
-
-                return $this->hook("/users/all/advertiser_invoices.xml", "advertiser-invoice", $request, 'GET');
-        }
-
-        /* Search for Advertiser Invoices */
-        function admin_advertiser_invoices_search($search, $page=1, $perpage=15) {
-                $request['page']    = $page;
-                $request['perpage'] = $perpage;
-                $request['search']  = $search;
-
-                return $this->hook("/advertiser_invoices/search.xml", "advertiser-invoice", $request, 'POST');
-        }
-
-        /* Create an Advertiser Invoice */
-        function admin_advertiser_invoice_create($user_id, $advertiser_invoice, $commissions, $fees) {
-                $request['advertiser_invoice'] = $advertiser_invoice;
-                $request['commissions'] = $commissions;
-                $request['fees'] = $fees;
-
-                return $this->hook("/users/$user_id/advertiser_invoices.xml", "advertiser-invoice", $request, 'POST');
-        }
-
-        /* Update an Advertiser Invoice */
-        function admin_advertiser_invoice_update($user_id, $advertiser_invoice_id, $advertiser_invoice, $fees=null) {
-                $request['advertiser_invoice'] = $advertiser_invoice;
-                $request['fees'] = $fees;
-
-                return $this->hook("/users/$user_id/advertiser_invoices/$advertiser_invoice_id.xml", "advertiser-invoice", $request, 'PUT');
-        }
-
-        /* Destroy an Advertiser Invoice */
-        function admin_advertiser_invoice_destroy($user_id, $advertiser_invoice_id) {
-                return $this->hook("/users/$user_id/advertiser_invoices/$advertiser_invoice_id.xml", "advertiser-invoice", null, 'DELETE');
-        }
-
-
-        /*=================*/
-        /* Admin Campaigns */
-        /*=================*/
-
-        /* List Campaigns. Displays the first 15 entries by default. */
-        function admin_campaigns_list($page=1, $perpage=15) {
-                $request['page']        = $page;
-                $request['perpage']     = $perpage;
-
-                return $this->hook("/campaigns.xml", "campaign", $request, 'GET');
-        }
-
-        /* Search for Advertiser Invoices */
-        function admin_campaigns_search($search, $page=1, $perpage=15) {
-                $request['page']    = $page;
-                $request['perpage'] = $perpage;
-                $request['search']  = $search;
-
-                return $this->hook("/campaigns/search.xml", "campaign", $request, 'POST');
-        }
-
-
-        /* Update a Campaign */
-        function admin_campaign_update($campaign_id, $suspend=null, $reset=null) {
-                $request['suspend'] = $suspend;
-                $request['reset']   = $reset;
-
-                return $this->hook("/campaigns/$campaign_id.xml", "campaign", $request, 'PUT');
-        }
-
-        /* Destroy a Campaign */
-        function admin_campaign_destroy($campaign_id) {
-                return $this->hook("/campaigns/$campaign_id.xml", "campaign", null, 'DELETE');
-        }
-
-        /*===================*/
-        /* Admin Commissions */
-        /*===================*/
-
-        /* List Affiliates Commissions  */
-        function admin_affiliates_commissions_list($search=null, $page=1, $perpage=15) {
-                $request['page']    = $page;
-                $request['perpage'] = $perpage;
-                $request['search']  = $search;
-
-                return $this->hook("/commissions/affiliates", "commission", $request, 'GET');
-        }
-
-        /* List Advertiser Commissions  */
-        function admin_advertisers_commissions_list($search=null, $page=1, $perpage=15) {
-                $request['page']    = $page;
-                $request['perpage'] = $perpage;
-                $request['search']  = $search;
-
-                return $this->hook("/commissions/advertisers", "commission", $request, 'GET');
-        }
-
-        /*==========*/
-        /* Deposits */
-        /*==========*/
-
-        /* List Deposits */
-        function admin_deposits_list($page=1, $perpage=15) {
-                $request['page']    = $page;
-                $request['perpage'] = $perpage;
-
-                return $this->hook("/deposits.xml", "deposit", $request, 'GET');
-        }
-
-        /* Create a Deposit */
-        function admin_deposit_create($deposit) {
-                $request['deposit'] = $deposit;
-
-                return $this->hook("/users/all/deposits.xml", "deposit", $request, 'POST');
-        }
-
-        /* Destroy a Deposit */
-        function admin_deposit_destroy($user_id, $deposit_id) {
-                return $this->hook("/users/$user_id/deposits/$deposit_id.xml", "deposit", null, 'DELETE');
-        }
-
-
-        /*=============*/
-        /* Admin Users */
-        /*=============*/
-
-        /* List Users */
-        function admin_users_list($page=1, $perpage=15) {
-                $request['page']    = $page;
-                $request['perpage'] = $perpage;
-
-                return $this->hook("/users.xml", "user", $request, 'GET');
-        }
-
-        /* Search for Users */
-        function admin_users_search($search=null, $page=1, $perpage=15) {
-                $request['page']    = $page;
-                $request['perpage'] = $perpage;
-                $request['search']  = $search;
-
-                return $this->hook("/users/search.xml", "user", $request, 'POST');
-        }
-
-        /* List Pending Users */
-        function admin_users_pending_list() {
-                return $this->hook("/users/pending.xml", "user", null, 'GET');
-        }
-
-        /* Process (Accept/Reject) a Pending User */
-        function admin_users_pending_process($user_id, $status, $message=null) {
-                $request['status'] = $status;
-                $request['message'] = $message;
-
-                return $this->hook("/users/$user_id/pending_process.xml", "user", $request, 'POST');
-        }
-
-        /* Destroy a User */
-        function admin_user_destroy($user_id) {
-                return $this->hook("/users/$user_id.xml", "user", null, 'DELETE');
-	}
 
         /*=======*/
         /* Hooks */
@@ -837,29 +605,19 @@ class TPerformant {
 	
 	function hook($url,$expected, $send = null, $method = 'GET') {
 		$returned = $this->unserialize($this->request($url, $send, $method));
-		
-
-		if(isset($returned->error)){
-			throw new TPException('API error reponse: ' . $returned->error);
-		}
-			
 		$placement = $expected;
 		if (isset($returned->{$expected})) {
 			$this->{$placement} = $returned->{$expected};	
 			return $returned->{$expected};
 		} else {
-			$this->{$placement} = $returned;
+			if ( $placement !== 'user' )
+				$this->{$placement} = $returned;
 			return $returned;
 		}
 	}
 	
 	function request($url, $params = null, $method) {
-                if (strpos($method, "admin_") == 0) {
-                  $admin_url = str_replace("api.", "admin.", $url);
-                  $url = $this->host . "/" . $admin_url;
-                } else {
-                  $url = $this->host . "/" . $this->version . $url;
-                }
+                $url = $this->host . "/" . $this->version . $url;
 
                 if ($this->auth_type == 'simple') {
                         return $this->simpleHttpRequest($url, $params, $method);
@@ -870,11 +628,10 @@ class TPerformant {
 
         function simpleHttpRequest($url, $params, $method) {
                 $req = new HTTP_Request2($url, $method);
-                $req->setConfig($this->config['HTTP_Request2_config']);
                 
                 //authorize
-                $req->setAuth($this->username, $this->password);
-
+                $req->setAuth($this->user, $this->pass);
+                
                 if ($params) {
                         //serialize the data
                         $xml = $this->serialize($params);
@@ -888,12 +645,9 @@ class TPerformant {
                 $response = $req->send();
 
                 if (PEAR::isError($response)) {
-                        throw new TPException($response->getMessage());
+                        return $response->getMessage();
                 } else {
-                	if(intval($response->getStatus()) < 200 || intval($response->getStatus()) >= 300) {
-                		throw new TPException('Unavailable server. Response code: '.$response->getStatus().' (' .$response->getReasonPhrase(). ')');
-                	}
-                	return $response->getBody();
+                        return $response->getBody();
                 }
         }
 
@@ -903,7 +657,6 @@ class TPerformant {
                 //set the headers
                 $this->oauthRequest->setHeader("Accept", "application/xml");
                 $this->oauthRequest->setHeader("Content-Type", "application/xml");
-                $this->oauthRequest->setConfig($this->config['HTTP_Request2_config']);
 
                 if ($params) {
                         //serialize the data
@@ -914,15 +667,7 @@ class TPerformant {
                 }
                 
                 $response = $this->oauth->sendRequest($url, array(), $method);
-                
-                if (PEAR::isError($response)) {
-                        throw new TPException($response->getMessage());
-                } else {
-                	if(intval($response->getStatus()) < 200 || intval($response->getStatus()) >= 300) {
-                		throw new TPException('Unavailable server. Response code: '.$response->getStatus().' (' .$response->getReasonPhrase(). ')');
-                	}
-                	return $response->getBody();
-                }
+                return $response->getBody();
         }
 
 	function serialize($data) {
@@ -938,11 +683,8 @@ class TPerformant {
 	function unserialize($xml) {
 		$options = array (XML_UNSERIALIZER_OPTION_COMPLEXTYPE => 'object');
 		$unserializer = new XML_Unserializer($options);
-		$status = $unserializer->unserialize($xml);
-		if(PEAR::isError($status)) {
-			throw new TPException('Unserializer error: ' . $status->getMessage());
-		}
-	    $data = $unserializer->getUnserializedData();
+		$status = $unserializer->unserialize($xml); 
+	    $data = (PEAR::isError($status))?$status->getMessage():$unserializer->getUnserializedData();
 		return $data;
 	}
 }

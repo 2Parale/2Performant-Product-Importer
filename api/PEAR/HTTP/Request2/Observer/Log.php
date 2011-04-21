@@ -6,7 +6,7 @@
  *
  * LICENSE:
  *
- * Copyright (c) 2008-2011, Alexey Borzov <avb@php.net>
+ * Copyright (c) 2008, 2009, Alexey Borzov <avb@php.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@
  * @author   David Jean Louis <izi@php.net>
  * @author   Alexey Borzov <avb@php.net>
  * @license  http://opensource.org/licenses/bsd-license.php New BSD License
- * @version  SVN: $Id: Log.php 308680 2011-02-25 17:40:17Z avb $
+ * @version  SVN: $Id: Log.php 290743 2009-11-14 13:27:49Z avb $
  * @link     http://pear.php.net/package/HTTP_Request2
  */
 
@@ -87,7 +87,7 @@ require_once 'HTTP/Request2/Exception.php';
  * @author   David Jean Louis <izi@php.net>
  * @author   Alexey Borzov <avb@php.net>
  * @license  http://opensource.org/licenses/bsd-license.php New BSD License
- * @version  Release: 2.0.0beta2
+ * @version  Release: 0.5.1
  * @link     http://pear.php.net/package/HTTP_Request2
  */
 class HTTP_Request2_Observer_Log implements SplObserver
@@ -109,7 +109,7 @@ class HTTP_Request2_Observer_Log implements SplObserver
     public $events = array(
         'connect',
         'sentHeaders',
-        'sentBody',
+        'sentBodyPart',
         'receivedHeaders',
         'receivedBody',
         'disconnect',
@@ -134,7 +134,7 @@ class HTTP_Request2_Observer_Log implements SplObserver
         }
         if (is_resource($target) || $target instanceof Log) {
             $this->target = $target;
-        } elseif (false === ($this->target = @fopen($target, 'ab'))) {
+        } elseif (false === ($this->target = @fopen($target, 'w'))) {
             throw new HTTP_Request2_Exception("Unable to open '{$target}'");
         }
     }
@@ -167,7 +167,7 @@ class HTTP_Request2_Observer_Log implements SplObserver
                 $this->log('> ' . $header);
             }
             break;
-        case 'sentBody':
+        case 'sentBodyPart':
             $this->log('> ' . $event['data'] . ' byte(s) sent');
             break;
         case 'receivedHeaders':

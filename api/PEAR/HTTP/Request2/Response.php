@@ -6,7 +6,7 @@
  *
  * LICENSE:
  *
- * Copyright (c) 2008-2011, Alexey Borzov <avb@php.net>
+ * Copyright (c) 2008, 2009, Alexey Borzov <avb@php.net>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@
  * @package    HTTP_Request2
  * @author     Alexey Borzov <avb@php.net>
  * @license    http://opensource.org/licenses/bsd-license.php New BSD License
- * @version    SVN: $Id: Response.php 308629 2011-02-24 17:34:24Z avb $
+ * @version    SVN: $Id: Response.php 290520 2009-11-11 20:09:42Z avb $
  * @link       http://pear.php.net/package/HTTP_Request2
  */
 
@@ -70,7 +70,7 @@ require_once 'HTTP/Request2/Exception.php';
  * @category   HTTP
  * @package    HTTP_Request2
  * @author     Alexey Borzov <avb@php.net>
- * @version    Release: 2.0.0beta2
+ * @version    Release: 0.5.1
  * @link       http://tools.ietf.org/html/rfc2616#section-6
  */
 class HTTP_Request2_Response
@@ -202,15 +202,12 @@ class HTTP_Request2_Response
     *
     * @param    string  Response status line (e.g. "HTTP/1.1 200 OK")
     * @param    bool    Whether body is still encoded by Content-Encoding
-    * @throws   HTTP_Request2_MessageException if status line is invalid according to spec
+    * @throws   HTTP_Request2_Exception if status line is invalid according to spec
     */
     public function __construct($statusLine, $bodyEncoded = true)
     {
         if (!preg_match('!^HTTP/(\d\.\d) (\d{3})(?: (.+))?!', $statusLine, $m)) {
-            throw new HTTP_Request2_MessageException(
-                "Malformed response: {$statusLine}",
-                HTTP_Request2_Exception::MALFORMED_RESPONSE
-            );
+            throw new HTTP_Request2_Exception("Malformed response: {$statusLine}");
         }
         $this->version = $m[1];
         $this->code    = intval($m[2]);
@@ -401,7 +398,7 @@ class HTTP_Request2_Response
     */
     public function getBody()
     {
-        if (0 == strlen($this->body) || !$this->bodyEncoded ||
+        if (!$this->bodyEncoded ||
             !in_array(strtolower($this->getHeader('content-encoding')), array('gzip', 'deflate'))
         ) {
             return $this->body;
@@ -452,8 +449,7 @@ class HTTP_Request2_Response
     *
     * @param    string  gzip-encoded data
     * @return   string  decoded data
-    * @throws   HTTP_Request2_LogicException
-    * @throws   HTTP_Request2_MessageException
+    * @throws   HTTP_Request2_Exception
     * @link     http://tools.ietf.org/html/rfc1952
     */
     public static function decodeGzip($data)
@@ -464,24 +460,15 @@ class HTTP_Request2_Response
             return $data;
         }
         if (!function_exists('gzinflate')) {
-            throw new HTTP_Request2_LogicException(
-                'Unable to decode body: gzip extension not available',
-                HTTP_Request2_Exception::MISCONFIGURATION
-            );
+            throw new HTTP_Request2_Exception('Unable to decode body: gzip extension not available');
         }
         $method = ord(substr($data, 2, 1));
         if (8 != $method) {
-            throw new HTTP_Request2_MessageException(
-                'Error parsing gzip header: unknown compression method',
-                HTTP_Request2_Exception::DECODE_ERROR
-            );
+            throw new HTTP_Request2_Exception('Error parsing gzip header: unknown compression method');
         }
         $flags = ord(substr($data, 3, 1));
         if ($flags & 224) {
-            throw new HTTP_Request2_MessageException(
-                'Error parsing gzip header: reserved bits are set',
-                HTTP_Request2_Exception::DECODE_ERROR
-            );
+            throw new HTTP_Request2_Exception('Error parsing gzip header: reserved bits are set');
         }
 
         // header is 10 bytes minimum. may be longer, though.
@@ -489,69 +476,45 @@ class HTTP_Request2_Response
         // extra fields, need to skip 'em
         if ($flags & 4) {
             if ($length - $headerLength - 2 < 8) {
-                throw new HTTP_Request2_MessageException(
-                    'Error parsing gzip header: data too short',
-                    HTTP_Request2_Exception::DECODE_ERROR
-                );
+                throw new HTTP_Request2_Exception('Error parsing gzip header: data too short');
             }
             $extraLength = unpack('v', substr($data, 10, 2));
             if ($length - $headerLength - 2 - $extraLength[1] < 8) {
-                throw new HTTP_Request2_MessageException(
-                    'Error parsing gzip header: data too short',
-                    HTTP_Request2_Exception::DECODE_ERROR
-                );
+                throw new HTTP_Request2_Exception('Error parsing gzip header: data too short');
             }
             $headerLength += $extraLength[1] + 2;
         }
         // file name, need to skip that
         if ($flags & 8) {
             if ($length - $headerLength - 1 < 8) {
-                throw new HTTP_Request2_MessageException(
-                    'Error parsing gzip header: data too short',
-                    HTTP_Request2_Exception::DECODE_ERROR
-                );
+                throw new HTTP_Request2_Exception('Error parsing gzip header: data too short');
             }
             $filenameLength = strpos(substr($data, $headerLength), chr(0));
             if (false === $filenameLength || $length - $headerLength - $filenameLength - 1 < 8) {
-                throw new HTTP_Request2_MessageException(
-                    'Error parsing gzip header: data too short',
-                    HTTP_Request2_Exception::DECODE_ERROR
-                );
+                throw new HTTP_Request2_Exception('Error parsing gzip header: data too short');
             }
             $headerLength += $filenameLength + 1;
         }
         // comment, need to skip that also
         if ($flags & 16) {
             if ($length - $headerLength - 1 < 8) {
-                throw new HTTP_Request2_MessageException(
-                    'Error parsing gzip header: data too short',
-                    HTTP_Request2_Exception::DECODE_ERROR
-                );
+                throw new HTTP_Request2_Exception('Error parsing gzip header: data too short');
             }
             $commentLength = strpos(substr($data, $headerLength), chr(0));
             if (false === $commentLength || $length - $headerLength - $commentLength - 1 < 8) {
-                throw new HTTP_Request2_MessageException(
-                    'Error parsing gzip header: data too short',
-                    HTTP_Request2_Exception::DECODE_ERROR
-                );
+                throw new HTTP_Request2_Exception('Error parsing gzip header: data too short');
             }
             $headerLength += $commentLength + 1;
         }
         // have a CRC for header. let's check
         if ($flags & 2) {
             if ($length - $headerLength - 2 < 8) {
-                throw new HTTP_Request2_MessageException(
-                    'Error parsing gzip header: data too short',
-                    HTTP_Request2_Exception::DECODE_ERROR
-                );
+                throw new HTTP_Request2_Exception('Error parsing gzip header: data too short');
             }
             $crcReal   = 0xffff & crc32(substr($data, 0, $headerLength));
             $crcStored = unpack('v', substr($data, $headerLength, 2));
             if ($crcReal != $crcStored[1]) {
-                throw new HTTP_Request2_MessageException(
-                    'Header CRC check failed',
-                    HTTP_Request2_Exception::DECODE_ERROR
-                );
+                throw new HTTP_Request2_Exception('Header CRC check failed');
             }
             $headerLength += 2;
         }
@@ -564,20 +527,11 @@ class HTTP_Request2_Response
         // don't pass $dataSize to gzinflate, see bugs #13135, #14370
         $unpacked = gzinflate(substr($data, $headerLength, -8));
         if (false === $unpacked) {
-            throw new HTTP_Request2_MessageException(
-                'gzinflate() call failed',
-                HTTP_Request2_Exception::DECODE_ERROR
-            );
+            throw new HTTP_Request2_Exception('gzinflate() call failed');
         } elseif ($dataSize != strlen($unpacked)) {
-            throw new HTTP_Request2_MessageException(
-                'Data size check failed',
-                HTTP_Request2_Exception::DECODE_ERROR
-            );
+            throw new HTTP_Request2_Exception('Data size check failed');
         } elseif ((0xffffffff & $dataCrc) != (0xffffffff & crc32($unpacked))) {
-            throw new HTTP_Request2_Exception(
-                'Data CRC check failed',
-                HTTP_Request2_Exception::DECODE_ERROR
-            );
+            throw new HTTP_Request2_Exception('Data CRC check failed');
         }
         return $unpacked;
     }
@@ -587,15 +541,12 @@ class HTTP_Request2_Response
     *
     * @param    string  deflate-encoded data
     * @return   string  decoded data
-    * @throws   HTTP_Request2_LogicException
+    * @throws   HTTP_Request2_Exception
     */
     public static function decodeDeflate($data)
     {
         if (!function_exists('gzuncompress')) {
-            throw new HTTP_Request2_LogicException(
-                'Unable to decode body: gzip extension not available',
-                HTTP_Request2_Exception::MISCONFIGURATION
-            );
+            throw new HTTP_Request2_Exception('Unable to decode body: gzip extension not available');
         }
         // RFC 2616 defines 'deflate' encoding as zlib format from RFC 1950,
         // while many applications send raw deflate stream from RFC 1951.
