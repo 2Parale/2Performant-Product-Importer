@@ -185,6 +185,8 @@ function TP_AJAX_wrapper_updateProduct() {
 			throw new Exception( sprintf( __( 'Invalid post ID: %1$s' ), $id ) );
 		
 		$product = tp_get_post_product_data( $id );
+		if( empty($product->{'product-store-id'}) || empty($product->id) )
+			throw new Exception( sprintf( __('Invalid attached product data for post %d'), $id ) );
 		
 		try {
 			require_once 'api.php';
@@ -197,8 +199,10 @@ function TP_AJAX_wrapper_updateProduct() {
 		}
 		
 		if ( ! $live_product ) {
-			// Delete the post
-			wp_delete_post( $id );
+			if( tp_get_option( 'add_feed', 'trash_expired', true ) ) {
+				// Delete the post
+				wp_delete_post( $id );
+			}
 			throw new Exception( sprintf( __( 'Expired product: %1$s' ), ( $product ? tp_strtopinfo( '%brand% %title% (%id%)', $product ) : '' ) ) );
 		}
 		

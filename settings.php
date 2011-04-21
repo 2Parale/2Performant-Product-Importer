@@ -47,6 +47,12 @@ function tp_register_settings() {
 					'label' => 'Update batch size',
 					'description' => 'The maximum number of products to update in a single step',
 					'default' => 50
+				),
+				'trash_expired' => array(
+					'type' => 'checkbox',
+					'label' => 'Trash expired products',
+					'description' => 'Check this to send posts containing products which are no longer available to trash when updating all products',
+					'default' => true
 				)
 			)
 		),
@@ -140,6 +146,10 @@ function tp_render_field( $setting ) {
 			$class = array_merge( array ( 'large-text', 'code' ), $class );
 			$class = implode( ' ', $class );
 			$output = "<textarea rows='10' cols='50' class='" . esc_attr( $class ) . "' name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "'>" . esc_attr( $value ) . "</textarea>";
+			break;
+		case 'checkbox':
+			$class = implode( ' ', $class );
+			$output = "<input type='checkbox' class='" . esc_attr( $class ) . "' name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "' ".((boolean)($value) ? "checked='checked'" : "")." />";
 			break;
 		case 'custom':
 			if ( isset( $callback ) ) {
@@ -353,5 +363,15 @@ function tp_plugin_settings_help( $contextual_help, $screen_id, $screen ) {
 }
 
 endif;
+
+function tp_get_option( $group, $name, $default = false ) {
+	$option = get_option( sprintf( 'tp_options_%s', $group ), array( $name => $default ) );
+	if( !is_array($option) )
+		$option = array( $name => $default );
+	if( !isset($option[$name]) )
+		$option[$name] = $default;
+		
+	return $option[$name];
+}
 
 ?>
