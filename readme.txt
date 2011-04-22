@@ -4,7 +4,7 @@ Donate link:
 Tags: affiliate, posts, commerce, products
 Requires at least: 3.0
 Tested up to: 3.1.1
-Stable tag: 0.9.6
+Stable tag: 0.9.7
 
 Imports products from product feeds in 2Performant affiliate networks, such as 2Parale.ro.
 
@@ -43,7 +43,7 @@ There's a bug/feature in Wordpress which gets in the way of the process. It's do
 
 == Changelog ==
 
-= 0.9.6 =
+= 0.9.7 =
 * **Critical Bugfix** accounting for API change
 * **New feature** `tp_get_the_product_field()` now accepts post ID as parameter
 
@@ -70,8 +70,8 @@ There's a bug/feature in Wordpress which gets in the way of the process. It's do
 
 == Upgrade Notice ==
 
-= 0.9.6 =
-Hotfix accounting for API change
+= 0.9.7 =
+Hotfix accounting for API change. You HAVE to install this version if you used 0.9.6.
 
 = 0.9.5 =
 Hotfix for updating products in environments running PHP <5.3
