@@ -184,9 +184,25 @@ function TP_AJAX_wrapper_updateProduct() {
 		if ( ! $p )
 			throw new Exception( sprintf( __( 'Invalid post ID: %1$s' ), $id ) );
 		
+		$product_id = intval( get_post_meta( $id, 'tp_product_ID', true ) );
+		if( !$product_id )
+			throw new Exception( sprintf( __('No product ID attached for post %d'), $id ) );
+			
 		$product = tp_get_post_product_data( $id );
-		if( empty($product->{'product-store-id'}) || empty($product->id) )
-			throw new Exception( sprintf( __('Invalid attached product data for post %d'), $id ) );
+		if( !is_object($product) || empty($product->{'product-store-id'}) || empty($product->id) ) {
+			$product = tp_get_wrapper()->product_store_products_search('approved',"@id $product_id");
+			if( empty( $product ) )
+				throw new Exception( sprintf( __('Invalid product data for ID %d'), $product_id ) );
+			if( !is_object($product) ) {
+				if( !is_array( $product ) )
+					throw new Exception( sprintf( __('Invalid product data received from API for ID %d'), $product_id ) );
+				while( is_array( $product ) ) {
+					$product = array_pop( $product );
+				}
+				if( !is_object($product) || empty($product->{'product-store-id'}) || empty($product->id) )
+					throw new Exception( sprintf( __('Invalid product data received from API for ID %d'), $product_id ) );
+			}
+		}
 		
 		try {
 			require_once 'api.php';
