@@ -49,10 +49,14 @@ function tp_add_product_from_feed( $id, $feed, $category = array() ) {
 		if(!empty($existing)) {
 			$post['ID'] = array_pop($existing)->ID;
 			unset( $post['post_status'] );
-			$func = 'wp_update_post';
+			$action = 'update';
 		} else {
-			$func = 'wp_insert_post';
+			$action = 'insert';
 		}
+		
+		$func = "wp_{$action}_post";
+		$post = apply_filters( "tp_{$action}_postdata", $post, $pinfo );
+		do_action( "tp_before_$action", $post );
 		
 		$ok = $func( $post );
 		if(!$ok)
@@ -68,6 +72,8 @@ function tp_add_product_from_feed( $id, $feed, $category = array() ) {
 		if( $func == 'wp_insert_post' && is_object( $pinfo->{'image-urls'} ) && tp_get_option( 'add_feed', 'post_gallery' ) )
 		if( isset( $pinfo->{'image-urls'}->{'image-url'} ) && is_array( $pinfo->{'image-urls'}->{'image-url'} ) )
 			tp_add_product_gallery($pinfo->{'image-urls'}->{'image-url'}, $ok);
+		
+		do_action( "tp_after_$action", get_post($ok) );
 		
 		return $ok;
 	} catch(Exception $e) {
