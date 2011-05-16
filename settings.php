@@ -1,7 +1,7 @@
 <?php
 if ( is_admin() ) :
 
-function tp_register_settings() {
+function _tp_get_settings( $section = false, $setting = false ) {
 	$settings = array(
 		'add_feed' => array(
 			'label' => 'When adding from a feed',
@@ -24,8 +24,32 @@ function tp_register_settings() {
 					),
 					'default' => 'draft'
 				),
-				'update_batch_size' => array(
+				'post_title' => array(
 					'type' => 'text',
+					'label' => 'Destination title structure',
+					'description' => 'What the post title will be comprised of',
+					'default' => '%brand% %title%'
+				),
+				'post_content' => array(
+					'type' => 'text',
+					'label' => 'Destination content structure',
+					'description' => 'What the post content will look like',
+					'default' => '%description%'
+				),
+				'post_featured_image' => array(
+					'type' => 'checkbox',
+					'label' => 'Destination featured image',
+					'description' => 'Download product main image (if available) and use it as post featured image',
+					'default' => true
+				),
+//				'post_gallery' => array(
+//					'type' => 'checkbox',
+//					'label' => 'Destination post gallery',
+//					'description' => 'Download all product images (if available) and attach them to newly created post',
+//					'default' => true
+//				),
+				'update_batch_size' => array(
+					'type' => 'number',
 					'label' => 'Update batch size',
 					'description' => 'The maximum number of products to update in a single step',
 					'default' => 50
@@ -91,13 +115,13 @@ function tp_register_settings() {
 					'label' => 'Password'
 				),
 				'connection_timeout' => array(
-					'type' => 'text',
+					'type' => 'number',
 					'label' => 'Connection timeout',
 					'description' => 'Time, in seconds, after which the connection to the API server is abandoned. Do not change unless you know what you are doing.',
 					'default' => 10
 				),
 				'timeout' => array(
-					'type' => 'text',
+					'type' => 'number',
 					'label' => 'Transfer timeout',
 					'description' => 'Total number of seconds each API request can take. Use 0 for no limit, should be greater than connection timeout if set. Do not change unless you know what you are doing.',
 					'default' => 0
@@ -126,6 +150,38 @@ function tp_register_settings() {
 			)
 		)
 	);
+	
+	if ( $section !== false ) 
+	if ( isset( $settings[$section] ) ) {
+		$settings = $settings[$section];
+		
+		if( $setting !== false )
+		if ( isset( $settings['settings'][$setting] ) ) {
+			$settings = $settings['settings'][$setting];
+		} else {
+			return false;
+		}
+	} else {
+		return false;
+	}
+	
+	return $settings;
+}
+
+function _tp_get_default( $section, $setting, $default = false ) {
+	$res = _tp_get_settings( $section, $setting );
+	if( $res && is_array( $res ) ) {
+		if( isset( $res['default'] ) )
+			return $res['default'];
+		else
+			return $default;
+	}
+	
+	return false;
+}
+
+function tp_register_settings() {
+	$settings = _tp_get_settings();
 	
 //	register_setting( 'tp-options-group', 'tp_options_post_type' );
 //	register_setting( 'tp-options-group', 'tp_options_fields' );
@@ -170,10 +226,11 @@ function tp_render_field( $setting ) {
 			$output = "<select name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "' class='".esc_attr( $class ) . "'>$output</select>";
 			break;
 		case 'text':
+		case 'number':
 		case 'password':
-			$class = array_merge( array ( 'regular-text' ), $class );
+			$class = array_merge( $type == 'number' ? array( 'small-text' ) : array ( 'regular-text' ), $class );
 			$class = implode( ' ', $class );
-			$output = "<input type='" . esc_attr( $type ) . "' class='" . esc_attr( $class ) . "' name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "' value='" . esc_attr( $value ) . "' />";
+			$output = "<input type='" . esc_attr( $type == 'number' ? 'text' : $type ) . "' class='" . esc_attr( $class ) . "' name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "' value='" . esc_attr( $value ) . "' />";
 			break;
 		case 'textarea':
 			$class = array_merge( array ( 'large-text', 'code' ), $class );
@@ -405,13 +462,14 @@ function tp_plugin_settings_help( $contextual_help, $screen_id, $screen ) {
 
 endif;
 
-function tp_get_option( $group, $name, $default = false ) {
+function tp_get_option( $group, $name, $default = null ) {
+	if( is_null($default) )
+		$default = _tp_get_default( $group, $name );
 	$option = get_option( sprintf( 'tp_options_%s', $group ), array( $name => $default ) );
 	if( !is_array($option) )
 		$option = array( $name => $default );
 	if( !isset($option[$name]) )
-		$option[$name] = $default;
-		
+		$option = array( $name => $default );
 	return $option[$name];
 }
 

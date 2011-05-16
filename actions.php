@@ -31,11 +31,14 @@ function tp_add_product_from_feed( $id, $feed, $category = array() ) {
 		if ( isset( $pinfo->error ) )
 			throw new Exception( sprintf( __( '2Performant API error: %1$s' ), $pinfo->error ), 101 );
 		
-		$post_status = get_option('tp_options_add_feed', array('post_status' => 'publish'));
-		$post_status = $post_status['post_status'];
+		$post_status = tp_get_option( 'add_feed', 'post_status' );
+		$post_title = tp_strtopinfo( tp_get_option( 'add_feed', 'post_title' ), $pinfo);
+		$post_content = tp_strtopinfo( tp_get_option( 'add_feed', 'post_content' ), $pinfo);
+		
 		$post = array(
 			'post_type' => $pt,
-			'post_title' => $pinfo->brand . " " . $pinfo->title,
+			'post_title' => $post_title,
+			'post_content' => $post_content,
 			'post_status' => $post_status,
 			'post_category' => $category
 		);
@@ -56,11 +59,15 @@ function tp_add_product_from_feed( $id, $feed, $category = array() ) {
 			$errors[] = 'Error adding/updating product';
 			
 		update_post_meta( $ok, 'tp_product_ID', $id );
-		tp_set_post_product_data( $ok, clone $pinfo );
+		tp_set_post_product_data( $ok, $pinfo );
 		tp_set_post_meta( $ok, $pinfo, ( $func == 'wp_update_post' ) );
 		
-		if( $func == 'wp_insert_post' && $pinfo->{'image-url'} )
+		if( $func == 'wp_insert_post' && $pinfo->{'image-url'} && tp_get_option( 'add_feed', 'post_featured_image' ) )
 			tp_add_product_thumbnail($pinfo->{'image-url'}, $ok);
+		
+		if( $func == 'wp_insert_post' && is_object( $pinfo->{'image-urls'} ) && tp_get_option( 'add_feed', 'post_gallery' ) )
+		if( isset( $pinfo->{'image-urls'}->{'image-url'} ) && is_array( $pinfo->{'image-urls'}->{'image-url'} ) )
+			tp_add_product_gallery($pinfo->{'image-urls'}->{'image-url'}, $ok);
 		
 		return $ok;
 	} catch(Exception $e) {
@@ -70,7 +77,7 @@ function tp_add_product_from_feed( $id, $feed, $category = array() ) {
 	return $errors;
 }
 
-function tp_add_product_thumbnail( $url, $post_id ) {
+function _tp_add_product_image( $url, $post_id ) {
 	// save image
 	$img = imagecreatefromstring( file_get_contents( $url ) );
 	$upload_dir = wp_upload_dir();
@@ -98,8 +105,27 @@ function tp_add_product_thumbnail( $url, $post_id ) {
 	$attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
 	wp_update_attachment_metadata( $attach_id,  $attach_data );
 	
-	// link to post as thumbnail
-	update_post_meta($post_id, '_thumbnail_id', $attach_id);
+	return $attach_id;
+}
+
+function tp_add_product_thumbnail( $url, $post_id ) {
+	if( ( $attach_id = _tp_add_product_image( $url, $post_id ) ) ) {
+		// link to post as thumbnail
+		update_post_meta($post_id, '_thumbnail_id', $attach_id);
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+
+function tp_add_product_gallery( $urls, $post_id ) {
+	if( !is_array($urls) )
+		return false;
+	
+	foreach( $urls as $url ) {
+		_tp_add_product_image( $url, $post_id );
+	}
 	
 	return true;
 }
@@ -191,7 +217,8 @@ function tp_decode_product_data( $data ) {
 	return $data;
 }
 
-function tp_encode_product_data( $data ) {
+function tp_encode_product_data( $realdata ) {
+	$data = is_object($realdata) ? clone $realdata : $realdata;
 	if( is_object( $data ) || is_array( $data ) ) {
 		foreach( $data as $k => $v ) {
 			if( is_object($data) )
