@@ -7,6 +7,7 @@ function tp_plugin_upgrade_settings() {
 	if( $oldversion === false ) {
 		$oldversion = 'v0.9';
 	}
+	update_option( 'tp_plugin_version', TPPI_VERSION );
 	
 	// OLDER THAN 1.0
 	
