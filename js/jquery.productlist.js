@@ -26,6 +26,19 @@
 			else
 				return IDs.pop();
 		},
+		tpplProductTemplate: function() {
+			var IDs = new Array();
+			$(this).each(function(index){
+				if($(this).is(':not(.tp-product-list-entry)'))
+					return false;
+				IDs[index] = $('input.tp-product-template[type=hidden]', $(this)).first().val();
+			});
+	
+			if(IDs.length > 1)
+				return IDs;
+			else
+				return IDs.pop();
+		},
 		tpplProductWrapper: function() {
 			if($(this).is('.tp-product-list-entry'))
 				return $(this);

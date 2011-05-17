@@ -80,10 +80,15 @@ function _tp_get_settings( $section = false, $setting = false ) {
 		'templates' => array(
 			'label' => 'Inserting products into post',
 			'settings' => array(
-				'template' => array(
-					'type' => 'textarea',
-					'label' => 'User-defined output template',
-					'default' => '<div class="tp-product-info">
+				'template_list' => array(
+					'type' => 'custom',
+					'label' => 'Templates',
+					'callback' => 'tp_render_options_templates_fields',
+					'default' => array(
+						'template1' => array(
+							'type' => 'textarea',
+							'label' => 'Template 1',
+							'value' => '<div class="tp-product-info">
 	<div class="tp-product-thumbnail">
 		<a href="%aff_link%">
 			<img src="%image-url%" />
@@ -95,8 +100,14 @@ function _tp_get_settings( $section = false, $setting = false ) {
 		<span class="tp-product-price">%price%</span>
 	</div>
 </div>'
-				)
-			)
+						),
+					)
+				),
+				'default_template' => array(
+					'type'	=> 'hidden',
+					'default' => 'template1'
+				),
+			),
 		),
 		'connection' => array(
 			'label' => 'Connection settings',
@@ -198,7 +209,7 @@ function tp_register_settings() {
 			$setting['id'] = "tp_options_{$section_id}_{$setting_id}";
 			$setting['name'] = "tp_options_{$section_id}[{$setting_id}]";
 			$setting['value'] = isset( $values[$setting_id] ) ? $values[$setting_id] : ( $values[$setting_id] = isset( $setting['default'] ) ? $setting['default'] : null );
-			add_settings_field( "tp_options_{$section_id}_{$setting_id}", __( $setting['label'], 'tppi' ), 'tp_render_field', 'tp-options', "tp_options_{$section_id}", $setting );			
+			add_settings_field( "tp_options_{$section_id}_{$setting_id}", __( $setting['label'], 'tppi' ), 'tp_render_field', 'tp-options', "tp_options_{$section_id}", $setting );	
 		}
 		if ( $defaults )
 			update_option( "tp_options_{$section_id}", $values );
@@ -231,6 +242,9 @@ function tp_render_field( $setting ) {
 			$class = array_merge( $type == 'number' ? array( 'small-text' ) : array ( 'regular-text' ), $class );
 			$class = implode( ' ', $class );
 			$output = "<input type='" . esc_attr( $type == 'number' ? 'text' : $type ) . "' class='" . esc_attr( $class ) . "' name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "' value='" . esc_attr( $value ) . "' />";
+			break;
+		case 'hidden':
+			$output = "<input type='hidden' name='" . esc_attr( $name ) . "' id='" . esc_attr( $id ) . "' value='" . esc_attr( $value ) . "' />";
 			break;
 		case 'textarea':
 			$class = array_merge( array ( 'large-text', 'code' ), $class );
@@ -355,6 +369,37 @@ function tp_render_options_fields_fields( $setting ) {
 	//*/
 }
 
+
+function tp_render_options_templates_fields( $setting ) {
+	extract($setting);
+	if ( ! $value )
+		$value = tp_get_option( 'templates', 'template_list' );
+		
+//		foreach ( $value as $kk => $vv ) {
+//			$value[$kk]['selectable_type'] = true;
+//		}
+?>
+		<p class="description">Key of any template should not contain whitespaces. See <a href="#" id="tp_options_templates_help">help section</a> for more details about templates.</p>
+
+		<script type="text/javascript"><!--//<![CDATA[
+		var tp_options_templates_list = <?php echo json_encode( $value ); ?>,
+			tp_options_templates_list_name = '<?php echo $name?>';
+	//]]--></script><a name="tp_options_templates_list" id="tp_options_templates_list_anchor"></a>
+<?php
+	/*
+	echo "<table id='tp_templates' class='fields'>";
+	echo "<tr class='head'><th scope='column'>" . __( 'Template name', 'tppi' ) . "</th><th scope='column'>" . __( 'Template output', 'tppi' ) . "</th></tr>";
+	foreach ( $value as $i => $p ) {
+		echo "<tr class='product_field tp_$i'><th scope='row'>" . $p['label'] . "</th><td class='product_field_value'><textarea rows='10' cols='80'>" . esc_attr( $p['value'] ) . "</textarea>";
+		foreach ( $p as $j => $v ) {
+			echo "<input type='hidden' name='{$name}[{$i}][{$j}]' id='{$id}_{$i}_{$j}' value='" . esc_attr( $p['value'] ) . "' />";
+		}
+		echo "</td></tr>";
+	}
+	echo "</table>";
+	*/
+}
+
 function tp_render_options_fields_other_fields( $setting ) {
 	extract($setting);
 	if ( ! $value )
@@ -471,6 +516,27 @@ function tp_get_option( $group, $name, $default = null ) {
 	if( !isset($option[$name]) )
 		$option = array( $name => $default );
 	return $option[$name];
+}
+
+function tp_set_option( $group, $name, $value ) {
+	$option = get_option( sprintf( 'tp_options_%s', $group ), array( $name => $value ) );
+	if( !is_array($option) )
+		$option = array( $name => $value );
+	if( !isset($option[$name]) )
+		$option[$name] = $value;
+	
+	update_option( sprintf( 'tp_options_%s', $group ), $option );
+}
+
+function tp_unset_option( $group, $name ) {
+	$option = get_option( sprintf( 'tp_options_%s', $group ), false );
+	if( !is_array($option) )
+		return false;
+	if( !isset($option[$name]) )
+		return false;
+	
+	unset( $option[$name] );
+	update_option( sprintf( 'tp_options_%s', $group ), $option );
 }
 
 ?>

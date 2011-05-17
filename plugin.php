@@ -94,11 +94,21 @@ function tp_the_product_field( $key, $id = false ) {
 	echo tp_get_the_product_field( $key, $id );
 }
 
-// [tp_product id="id" feed="feed"]
+include_once 'actions.php';
+include_once 'settings.php';
+include_once 'edit-page-boxes.php';
+include_once 'add-from-feed.php';
+include_once 'toolbox.php';
+include_once 'listing.php';
+include_once 'edit-page-button.php';
+include_once 'upgrade-plugin.php';
+
+// [tp_product id="id" feed="feed" template="template"]
 function tp_product_shortcode( $atts ) {
 	extract( shortcode_atts( array (
 		'id' => false,
 		'feed' => false,
+		'template' => false,
 	), $atts ) );
 	
 	if( ! ( is_numeric( $id ) && is_numeric( $feed ) ) )
@@ -112,9 +122,10 @@ function tp_product_shortcode( $atts ) {
 	if( empty( $pinfo ) || isset( $pinfo->error ) )
 		return false;
 	
-	$template = get_option( 'tp_options_templates' );
+	$tpl = tp_get_option( 'templates', 'template_list', false );
+	$tpl = $tpl[$template];
 	
-	if( $template === false ) {
+	if( $tpl === false ) {
 		ob_start();
 ?>
 	<div class="tp-product-info">
@@ -136,7 +147,7 @@ function tp_product_shortcode( $atts ) {
 		
 		ob_end_clean();
 	} else {
-		$template = $template['template'];
+		$template = $tpl['value'];
 		
 		$html = tp_strtopinfo( $template, $pinfo );
 	}
@@ -144,14 +155,6 @@ function tp_product_shortcode( $atts ) {
 	return $html;
 }
 add_shortcode( 'tp_product', 'tp_product_shortcode' );
-
-include_once 'actions.php';
-include_once 'settings.php';
-include_once 'edit-page-boxes.php';
-include_once 'add-from-feed.php';
-include_once 'toolbox.php';
-include_once 'listing.php';
-include_once 'edit-page-button.php';
 
 
 /**
@@ -176,15 +179,21 @@ add_filter('plugin_action_links', 'tp_plugin_action_links', 10, 2);
 add_filter('query_vars','tp_add_cache_trigger');
 function tp_add_cache_trigger($vars) {
 	$vars[] = 'tp_checkcache';
+	$vars[] = 'tp_preview_template';
 	return $vars;
 }
 
-add_action('template_redirect', 'tp_cache_trigger_check');
-function tp_cache_trigger_check() {
+add_action('template_redirect', 'tp_check_queryvars');
+function tp_check_queryvars() {
 	if(get_query_var('tp_checkcache') == 'true') {
 		include_once 'api.php';
 		$res = tp_cache_get( 'tp_testdata' );
 		echo $res ? $res : 'no';
+		exit;
+	}
+	
+	if(get_query_var('tp_preview_template') == 'true') {
+		include_once 'tinymce-insert/preview.php';
 		exit;
 	}
 }

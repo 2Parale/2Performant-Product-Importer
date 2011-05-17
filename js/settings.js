@@ -2,7 +2,9 @@
 	$.extend({
 		tpFieldTable: function(data,name,options){
 			var defaults = {
-				selectable_type: false
+				selectable_type: false,
+				button: "Add field",
+				template: 0
 			};
 			options = $.extend({}, defaults, options);
 			
@@ -12,7 +14,7 @@
 				data[i]['selectable_type'] = options.selectable_type;
 				fields.append(
 					$('<tr />')
-						.tpFieldRow(data[i],name)
+						.tpFieldRow(data[i],name,options.template)
 				);
 			}
 			
@@ -37,12 +39,12 @@
 								.attr('colspan',fields.find('tr:first').children().size())
 								.append(
 									$('<a href="#" />')
-										.html('Add field')
+										.html(options.button)
 										.addClass('button-secondary')
 										.click(function(e){
 											var tableOptions = options;
 											e.preventDefault();
-											var row = $('<tr />').tpFieldRow({selectable_type: tableOptions.selectable_type},name).tpEditField(name);
+											var row = $('<tr />').tpFieldRow({selectable_type: tableOptions.selectable_type},name,tableOptions.template).tpEditField(name,tableOptions.template);
 											$(this).parents('.tp-field-add').before(
 												row
 											);
@@ -58,9 +60,11 @@
 			return res;
 		},
 	});
-	
+	function htmlEntities(str) {
+	    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	}
 	$.fn.extend({
-		tpFieldRow: function(data, name) {
+		tpFieldRow: function(data, name, template) {
 			data = $.extend({
 				label: '',
 				key: '',
@@ -68,13 +72,50 @@
 				type: '',
 				selectable_type: false
 			}, data);
-			
+			var sizeTd = ( template == 1 ) ? "70%" : "30%";
+			if( template == 1 ) {
+				
+				var defaultTemplate = $('#tp_options_templates_default_template').val();
+				var buttonNotChecked = $('<img src="../wp-content/plugins/2performant-product-importer/img/template.png" alt="Set template as default" />');
+				var buttonChecked = $('<img src="../wp-content/plugins/2performant-product-importer/img/default_template.png" alt="This is the default template" />');
+				var defaultButton = ( data['key'] != defaultTemplate ) ? buttonNotChecked : buttonChecked ;
+				var defaultTitle = ( data['key'] != defaultTemplate ) ? "Set this template as default" : "This is the default template";
+				var templateButton = $('<a title="Set as default" />')
+									.addClass('tp-default-template')
+									.html(defaultButton)
+									.attr('href','#').attr('title',defaultTitle)
+									.click(function(e){
+										e.preventDefault();
+										$('#tp_options_templates_default_template').val(data['key']);
+										$('.tp-default-template').html(buttonNotChecked);
+										$('.tp-default-template').attr('title','Set this template as default');
+										$(this).html(buttonChecked);
+										$(this).attr('title','This is the default template');
+									})	
+			}
+			var button1 = ( template == 1 ) ? $('<a />')
+					.addClass('tp-edit')
+					.html($('<img src="../wp-content/plugins/2performant-product-importer/img/edit.png" alt="Edit template" />'))
+					.attr('href','#')
+					.click(function(e){
+						e.preventDefault();
+						$(this).parents('tr:first').tpEditField(name,template);
+					}) :
+						$('<a />')
+						.addClass('tp-edit')
+						.html('Edit')
+						.attr('href','#')
+						.click(function(e){
+							e.preventDefault();
+							$(this).parents('tr:first').tpEditField(name,template);
+						})
+			var button2 = ( template == 1 ) ? templateButton : '';
 			return $(this)
 				.html('')
 				.addClass('tp-field')
 				.addClass('tp-'+data['key'])
 				.append(
-					$('<th class="tp-editable tp-field-label" scope="row" />')
+					$('<th class="tp-editable tp-field-label" scope="row"  valign="top"/>')
 						.append(data['label'])
 						.append(
 							$('<input type="hidden" />')
@@ -86,33 +127,29 @@
 								.val(data['label'])
 						)
 				).append(
-					$('<td class="tp-editable tp-field-key" />')
+					$('<td class="tp-editable tp-field-key" valign="top" />')
 						.append(data['key'])
 				).append(
-					$('<td class="tp-editable tp-field-value" />')
-						.append(data['value'])
+					$('<td class="tp-editable tp-field-value" width="' + sizeTd + '"  valign="top"/>')
+						.append("<pre><code>" + htmlEntities ( data['value'] ) + "</code></pre>")
 						.append(
 								$('<input type="hidden" />')
 									.attr('name',name+'['+data['key']+'][value]')
 									.val(data['value'])
 							)
 				).append(
-					$('<td class="tp-field-action" />')
+					
+					$('<td class="tp-field-action" valign="top" />')
 						.append(
-							$('<a />')
-							.addClass('tp-edit')
-							.html('Edit')
-							.attr('href','#')
-							.click(function(e){
-								e.preventDefault();
-								$(this).parents('tr:first').tpEditField(name);
-							})
+							button1
+						).append(
+							button2
 						)
 				)
 				.data('fieldData',data)
 			;
 		},
-		tpEditField: function(name) {
+		tpEditField: function(name,template) {
 			return $(this).each(function(){
 				var target = {
 						label: $('.tp-field-label', this),
@@ -120,19 +157,19 @@
 						value: $('.tp-field-value', this),
 					},
 					data = $(this).data('fieldData'),
-					t = $('<td />').html(target.label.html()).addClass('tp-field-label')
+					t = $('<td valign="top" />').html(target.label.html()).addClass('tp-field-label')
 				;
 				target.label.replaceWith(t);
 				target.label = t;
+				
 				for(var i in target) {
+					var textarea = ( template == 1 ) ? $( '<textarea rows="10" cols="80" />' ).attr( 'name' ,i ).text( data[i] ) :  $( '<textarea />' ).attr( 'name' ,i ).text( data[i] ); 
 					var edit_control = (i != 'value') ? ( 
 							$('<input type="text" />')
 								.attr('name',i)
 								.val(data[i])
 						) : (
-							$('<textarea />')
-								.attr('name',i)
-								.text(data[i])
+								textarea
 						);
 					target[i].html(edit_control);
 				}
@@ -154,6 +191,7 @@
 				}
 				
 				$('.tp-field-action > a.tp-edit',this).remove();
+				$('.tp-field-action > a.tp-default-template',this).remove();
 				$('.tp-field-action',this).append(
 					$('<a href="#" title="OK" />')
 					//.addClass('button-primary')
@@ -181,7 +219,7 @@
 							}
 						}
 						if(ok)
-							$(row).tpFieldRow(data,name);
+							$(row).tpFieldRow(data,name,template);
 					})
 				).append(
 					' '
@@ -193,7 +231,7 @@
 							var row = $(this).parents('tr:first'),
 								data = row.data('fieldData');
 							if(data.key != '')
-								$(row).tpFieldRow(data,name);
+								$(row).tpFieldRow(data,name,template);
 							else
 								$(row).remove();
 						})
@@ -215,12 +253,15 @@
 	$(document).ready(function(){
 		$('table.fields#tp_fields_fields').remove();
 		$.tpFieldTable(tp_options_fields_fields,tp_options_fields_fields_name, {selectable_type: true}).insertAfter('#tp_options_fields_fields_anchor');
-		$('#tp_options_fields_fields_help, #tp_options_fields_other_fields_help').click(function(e){
+		$.tpFieldTable(tp_options_templates_list,tp_options_templates_list_name, {button: "Add template", template: 1}).insertAfter('#tp_options_templates_list_anchor');
+		
+		$('#tp_options_fields_fields_help, #tp_options_fields_other_fields_help, #tp_options_templates_help').click(function(e){
 			e.preventDefault();
 			$('html, body').animate({scrollTop:0}, 'fast');
 			$('#contextual-help-link').click();
 		});
 		$('table.fields#tp_fields_other_fields').remove();
 		$.tpFieldTable(tp_options_fields_other_fields,tp_options_fields_other_fields_name).insertAfter('#tp_options_fields_other_fields_anchor');
+		
 	});
 })(jQuery.noConflict());

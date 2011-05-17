@@ -60,6 +60,7 @@ function tp_ajax_insertproduct_container() {
 	$uniq_ids = true;
 	$products = $tp->product_store_products_search($campaignID, $search, $feedID, null, $page, $perpage, $sort, $uniq_ids);
 	$products = fix_result($products);
+	$defaultTemplate = tp_get_option( 'templates', 'default_template' );
 	$i = -1;
 ?>
 	<ul class="tp-product-list clear">
@@ -71,7 +72,8 @@ function tp_ajax_insertproduct_container() {
 	if ( $pr ) $outdated = tp_check_product_outdated($product, $pr);
 	unset($t);
 ?>
-	<li class="tp-product-list-entry<?php echo !($i = ++$i % 4) ? " clear" : ''; ?>">
+
+	<li class="tp-product-list-entry<?php echo $pr && $outdated ? ' outdated' : ''; echo !($i = ++$i % 4) ? " clear" : ''; echo ($pr && $pr->post_status == 'trash') ? ' trash' : ''; ?>">
 		<p class="tp-product-image product-<?php echo $product->id; ?>">
 			<a href="<?php echo $product->url; ?>" target="_blank"><img src="<?php echo $product->{'image-url'}; ?>" title="<?php echo $product->title; ?>" class="tp-product-thumbnail" /></a>
 			<br/>
@@ -82,11 +84,15 @@ function tp_ajax_insertproduct_container() {
 		
 		<input type="hidden" id="tp_product_<?php echo $product->id; ?>_id" class="tp-product-id" value="<?php echo $product->id; ?>" />
 		<input type="hidden" id="tp_product_<?php echo $product->id; ?>_feed_id" class="tp-product-feed-id" value="<?php echo $product->{'product-store-id'}; ?>" />
+		<input type="hidden" id="tp_product_<?php echo $product->id; ?>_template" class="tp-product-template" value="<?php echo $defaultTemplate; ?>" />
+		
+		<div class="tp-product-toolbox product-<?php echo $product->id; ?>"></div>	
 		
 		<p class="tp-action-row submitbox">
-			<input type="button" id="tp_product_<?php echo $product->id; ?>_button" class="button-secondary tp-product-action-button product-<?php echo $product->id; ?>" value="<?php _e( 'Insert', 'tppi' ); ?>" />
+			<input type="button" id="tp_product_<?php echo $product->id; ?>_button" class="button-secondary tp-product-action-button product-<?php echo $product->id; ?>" />
 		</p>
 	</li>
+	
 <?php endforeach; ?>
 	</ul>
 	<div class="tablenav">

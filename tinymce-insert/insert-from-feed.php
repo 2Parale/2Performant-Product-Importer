@@ -4,9 +4,23 @@ $dir = str_replace( '\\', '/', dirname(__FILE__) );
 $pos = strpos( $dir, 'wp-content/plugins');
 $dir = substr( $dir, 0, $pos );
 
+function tp_templates_dropdown( $options = array(), $defaultTemplate ) {
+?>
+<select name='tp_templates_list' id='tp_templates_list' class=''>
+<?php
+	foreach ( $options as $name => $value ) :
+?>
+			<option <?php echo ( $name == $defaultTemplate ) ? "selected='selected'" : ""; ?> value="<?php echo $name; ?>" class="level-0"><?php echo $options[$name]['label']; ?></option>
+<?php
+	endforeach;
+?>
+</select>
+<?php
+}
+
 require_once( $dir . 'wp-admin/admin.php' );
 
-$title = __( 'Insert product from a feed', 'tppi' );
+$title = __( 'Insert products from a feed', 'tppi' );
 
 @header('Content-Type: ' . get_option('html_type') . '; charset=' . get_option('blog_charset'));
 
@@ -34,6 +48,21 @@ var tpBaseUrl = '<?php echo get_bloginfo('url').'/wp-content/plugins/'.dirname(d
 <style type="text/css">
 .container {
 	margin: 1em;
+}
+.dotted {
+	display:block;
+	height:1px;
+	border-top:1px dotted #c0c0c0;
+	margin:5px 0;
+	margin-top:10px;
+	clear:both;
+}
+.tp_templates_list {
+	float:left;
+}
+.tp_template_preview, .tp_templates_edit {
+	float:right;
+	margin:3px 2px 0 2px;
 }
 </style>
 <?php
@@ -70,22 +99,9 @@ do_action('admin_head');
 <?php else : ?>
 		<script type="text/javascript">
 		//<![CDATA[
-		jQuery.tp_insertProduct = {
+		var html = '';
+		var wpurl = '<?php bloginfo('wpurl') ?>';
 		
-			id : '',
-			feed : '',
-			name : '',
-		
-			insert : function(id, feed) {
-				var html = '';
-
-				html += '[tp_product id="'+id+'" feed="'+feed+'"]';
-				
-				var win = window.dialogArguments || opener || parent || top;
-				win.send_to_editor(html);
-				return false;
-			}
-		}
 		//]]>
 		</script>
 		<div id="tp_insert_filter">
@@ -97,7 +113,9 @@ do_action('admin_head');
 	
 	$search = isset($_REQUEST['s']) ? $_REQUEST['s'] : '';
 	$page = isset($_REQUEST['tp_insert_page']) ? $_REQUEST['tp_insert_page'] : 1;
-
+	
+	$templatesList = tp_get_option( 'templates', 'template_list' );
+	$defaultTemplate = tp_get_option( 'templates', 'default_template' );
 ?>
 			<form method="get">
 			<label for="tp_insert_filter_feed">Feed</label>
@@ -115,6 +133,22 @@ do_action('admin_head');
 		</div>
 		<input type="hidden" id="tp_ajax_nonce" value="<?php echo wp_create_nonce( 'tp_ajax_nonce' ); ?>" />
 		<div id="tp_product_list_container"></div>
+		
+		<div id="tp-insert-toolbox" class="wrap">
+			<div class="dotted"></div>
+			<div id="tp-templates-all">
+				<label for="tp_templates_list"><small>Select template</small></label>
+				<?php
+					tp_templates_dropdown( $templatesList, $defaultTemplate );
+				?>	
+				<a href="#" class="tp_templates_edit" title="Edit the templates"><img src="<?php bloginfo('wpurl') ?>/wp-content/plugins/2performant-product-importer/img/edit.png" border="0" /></a>
+				<a href="#" class="tp_template_preview" title="Preview the product with template selected"><img src="<?php bloginfo('wpurl') ?>/wp-content/plugins/2performant-product-importer/img/preview.png" border="0" /></a>
+				<div class="dotted"></div>
+				<input id="done-insert" name="done-insert" type="checkbox" checked="checked"/>
+				<label for="done-insert"><small>This is the last product I want to insert</small></label>
+				
+			</div>
+	</div>
 <?php endif; ?>
 
 <?php /* ?>
