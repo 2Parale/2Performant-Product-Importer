@@ -1,5 +1,25 @@
 (function($){
 	$.fn.extend({
+		checkCheckbox: function(checkit) {
+			if(typeof checkit == 'undefined')
+				checkit = true;
+			if(!checkit)
+				return $(this.unckeckCheckbox());
+			return $(this).each(function(){
+				if(typeof $(this).prop == 'function')
+					$(this).prop('checked', true);
+				else
+					$(this).attr('checked','checked');
+			});
+		},
+		uncheckCheckbox: function() {
+			return $(this).each(function(){
+				if(typeof $(this).prop == 'function')
+					$(this).prop('checked', false);
+				else
+					$(this).attr('checked',null);
+			});
+		},
 		prepareInputs: function() {
 			return $(this).each(function(){
 				$('#tp_product_' + $(this).tpplProductId() + '_button')
@@ -48,9 +68,9 @@
 				toolbox.detachToolbox(function(){
 					toolbox.find(':checkbox[name^="post_category"]').each(function(){
 						if($.inArray($(this).val(), cats) !== -1)
-							$(this).attr('checked', 'checked');
+							$(this).checkCheckbox();
 						else
-							$(this).attr('checked', null);
+							$(this).uncheckCheckbox();
 					});
 					toolbox.appendTo(destination).slideDown('fast', function(){
 						wrapper.tpActionButton()
@@ -201,7 +221,7 @@
 							return;
 						noSyncChecks = true;
 						var th = jQuery(this), c = th.is(':checked'), id = th.val().toString();
-						$('#in-' + taxonomy + '-' + id + ', #in-' + taxonomy + '-category-' + id).attr( 'checked', c );
+						$('#in-' + taxonomy + '-' + id + ', #in-' + taxonomy + '-category-' + id).checkCheckbox( c );
 						noSyncChecks = false;
 					};
 		
@@ -238,7 +258,7 @@
 					$('#' + taxonomy + 'checklist li.popular-category :checkbox, #' + taxonomy + 'checklist-pop :checkbox').live( 'click', function(){
 						var t = $(this), c = t.is(':checked'), id = t.val();
 						if ( id && t.parents('#taxonomy-'+taxonomy).length )
-							$('#in-' + taxonomy + '-' + id + ', #in-popular-' + taxonomy + '-' + id).attr( 'checked', c );
+							$('#in-' + taxonomy + '-' + id + ', #in-popular-' + taxonomy + '-' + id).checkCheckbox( c );
 					});
 		
 				}); // end cats
