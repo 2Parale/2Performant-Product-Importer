@@ -33,6 +33,7 @@ function tp_product_add_from_feed() {
 <?php else : ?>
 	<!-- Habebum connectorum! -->
 <?php
+	ob_start();
 	try {
 	$products = array();
 	$campaignID = 'approved';
@@ -60,7 +61,7 @@ function tp_product_add_from_feed() {
 <?php endif; ?>
 		<input type="hidden" name="page" value="tp_product_add_from_feed" />
 		<label for="tp_add_filter_feed">Feed</label>
-		<?php tp_feed_dropdown( array(
+		<?php echo tp_feed_dropdown( array(
 			'name' => 'tp_add_filter_feed',
 			'id' => 'tp_add_filter_feed',
 			'class' => 'postform',
@@ -109,11 +110,15 @@ function tp_product_add_from_feed() {
 			<?php endif; ?>
 		</div>
 	</div>
-<?php } catch(Exception $e) { ?>
+<?php } catch(Exception $e) {
+		ob_end_clean(); 
+?>
 	<div id="setting-error-options_error" class="error settings-error">
-		<p><?php _e(gettype($e) . ': ' . $e->getMessage(), 'tppi'); ?></p>
+		<p><?php _e(get_class($e) . ': ' . $e->getMessage(), 'tppi'); ?></p>
 	</div>
-<?php } ?>
+<?php } 
+	ob_end_flush();
+?>
 </div><?php
 	endif;
 }

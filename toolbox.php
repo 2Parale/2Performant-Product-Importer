@@ -50,7 +50,7 @@ function tp_product_toolbox() {
 <?php
 	require_once 'api.php';
 	
-	tp_campaign_dropdown( array(
+	echo tp_campaign_dropdown( array(
 		'name' => 'tp_toolbox_deletecampaign_campaign',
 		'id' => 'tp_toolbox_deletecampaign_campaign',
 		'class' => 'postform'

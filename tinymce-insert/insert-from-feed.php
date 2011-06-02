@@ -120,7 +120,7 @@ do_action('admin_head');
 			<form method="get">
 			<label for="tp_insert_filter_feed">Feed</label>
 			<?php
-				tp_feed_dropdown( array(
+				echo tp_feed_dropdown( array(
 					'name' => 'tp_insert_filter_feed',
 					'id' => 'tp_insert_filter_feed',
 					'value' => $selectFeed
@@ -190,7 +190,7 @@ do_action('admin_head');
 		<div id="tp_insert_filter">
 			<label for="tp_insert_filter_feed">Feed</label>
 			<?php
-				tp_feed_dropdown( array(
+				echo tp_feed_dropdown( array(
 					'name' => 'tp_insert_filter_feed',
 					'id' => 'tp_insert_filter_feed',
 				) );
