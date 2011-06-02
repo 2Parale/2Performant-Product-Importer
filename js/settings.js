@@ -172,9 +172,9 @@
 							ok = true
 						;
 						for(var i in data) {
-							var t = row.find(':input[name='+i+']').css('border-color',null).val();
+							var t = row.find(':input[name="'+i+'"]').css('border-color',null).val();
 							if(t == '') {
-								row.find(':input[name='+i+']').css('border-color','#900')
+								row.find(':input[name="'+i+'"]').css('border-color','#900')
 								ok = false;
 							} else {
 								data[i] = t;

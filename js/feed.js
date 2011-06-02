@@ -46,7 +46,7 @@
 					cats = wrapper.data('cats');
 				wrapper.addClass('expanded');
 				toolbox.detachToolbox(function(){
-					toolbox.find(':checkbox[name^=post_category]').each(function(){
+					toolbox.find(':checkbox[name^="post_category"]').each(function(){
 						if($.inArray($(this).val(), cats) !== -1)
 							$(this).attr('checked', 'checked');
 						else
@@ -77,7 +77,7 @@
 		tpAddProduct: function() {
 			return $(this).tpplProductWrapper().each(function(){
 				var data, categories = new Array(), _this = this;
-				$('#tp-insert-toolbox :checked[name^=post_category]').each(function(){
+				$('#tp-insert-toolbox :checked[name^="post_category"]').each(function(){
 					categories.push($(this).val());
 				});
 				
