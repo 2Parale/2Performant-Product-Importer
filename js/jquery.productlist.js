@@ -5,7 +5,7 @@
 			$(this).each(function(index){
 				if($(this).is(':not(.tp-product-list-entry)'))
 					return false;
-				IDs[index] = $('.tp-product-id:input[type=hidden]', $(this)).first().val();
+				IDs[index] = $('.tp-product-id:input[type="hidden"]', $(this)).first().val();
 			});
 	
 			if(IDs.length > 1)
@@ -18,7 +18,7 @@
 			$(this).each(function(index){
 				if($(this).is(':not(.tp-product-list-entry)'))
 					return false;
-				IDs[index] = $('.tp-product-feed-id:input[type=hidden]', $(this)).first().val();
+				IDs[index] = $('.tp-product-feed-id:input[type="hidden"]', $(this)).first().val();
 			});
 	
 			if(IDs.length > 1)
