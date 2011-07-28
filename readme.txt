@@ -3,8 +3,8 @@ Contributors: 2parale, tetele
 Donate link: 
 Tags: affiliate, posts, commerce, products
 Requires at least: 3.0
-Tested up to: 3.1.1
-Stable tag: 0.9.7
+Tested up to: 3.2.1
+Stable tag: 0.9.8
 
 Imports products from product feeds in 2Performant affiliate networks, such as 2Parale.ro.
 
