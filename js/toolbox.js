@@ -94,7 +94,7 @@
 				enqueue: enqueue
 			},callbacks));
 		},
-		tpUpdateAll: function(target) {
+		tpUpdateAll: function(target, options) {
 			target = $(target);
 			
 			target.html('Preparing to update...');
@@ -158,11 +158,13 @@
 											if(k == 'length')
 												continue;
 											var pid = products[k];
+											var overwrites = options.overwrites || null;
 											
 											$.tpPost(
 												'updateProduct',
 												{
-													post_id: pid
+													post_id: pid,
+													overwrites: overwrites
 												},
 												{
 													success: function(r,s,x) {
@@ -222,7 +224,10 @@
 			} else {
 				$('#tp_updateall_log').tpLogWarning(message);
 			}
-			$('#tp_toolbox_do_updateall').attr('disabled', null);
+			typeof($('#tp_toolbox_do_updateall').prop)=='function'
+				? $('#tp_toolbox_do_updateall').prop('disabled', false)
+				: $('#tp_toolbox_do_updateall').attr('disabled', null)
+			;
 		},
 		tpDeleteCampaign: function(target) {
 			target = $(target);
@@ -316,17 +321,38 @@
 					$('#tp_deletecampaign_log').tpLogWarning(message);
 				}
 			}
-			$('#tp_toolbox_do_deletecampaign').attr('disabled', null);
+			typeof($('#tp_toolbox_do_deletecampaign').prop)=='function'
+				? $('#tp_toolbox_do_deletecampaign').prop('disabled', false)
+				: $('#tp_toolbox_do_deletecampaign').attr('disabled', null)
+			;
 		},
 	});
 	
 	$(document).ready(function(){
 		$('#tp_toolbox_do_updateall').click(function(){
-			$(this).attr('disabled', 'disabled');
-			$.tpUpdateAll($('#tp_toolbox_updateall .tp-container'));
+			var overwrites = new Array();
+			$('#update_overwrites').find(':checkbox').each(function(){
+				var value = $('label[for="'+$(this).attr('id')+'"]').first().text();
+				if($(this).is(':checked'))
+					if('yes' == (prompt('Type in "yes" (without the quotes) if you are sure you want to force the update of "'+value+'" for every product, including where you modified it by hand.')+'').toLowerCase()) {
+						var key = $(this).val();
+						overwrites.push(key);
+					} else {
+						alert(value+' will not be modified for the products where you edited it by hand.');
+					}
+			});
+			typeof($(this).prop)=='function'
+				? $(this).prop('disabled', true)
+				: $(this).attr('disabled', 'disabled')
+			;
+			
+			$.tpUpdateAll($('#tp_toolbox_updateall .tp-container'), {'overwrites': overwrites});
 		});
 		$('#tp_toolbox_do_deletecampaign').click(function(){
-			$(this).attr('disabled', 'disabled');
+			typeof($(this).prop)=='function'
+				? $(this).prop('disabled', true)
+				: $(this).attr('disabled', 'disabled')
+			;
 			$.tpDeleteCampaign($('#tp_toolbox_deletecampaign .tp-container'));
 		});
 	});

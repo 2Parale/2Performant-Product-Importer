@@ -12,7 +12,7 @@ function tp_strtopinfo( $str, $info ) {
 	return $str;
 }
 
-function tp_add_product_from_feed( $id, $feed, $category = array() ) {
+function tp_add_product_from_feed( $id, $feed, $category = array(), $overwrites = array() ) {
 	include_once 'api.php';
 	$tp = tp_get_wrapper();
 	
@@ -20,6 +20,8 @@ function tp_add_product_from_feed( $id, $feed, $category = array() ) {
 	
 	if ( ! is_array( $category ) )
 		$category = array( $category );
+	if ( ! is_array( $overwrites ) )
+		$overwrites = array( $overwrites );
 	
 	$errors = array();
 	try {
@@ -64,7 +66,7 @@ function tp_add_product_from_feed( $id, $feed, $category = array() ) {
 			
 		update_post_meta( $ok, 'tp_product_ID', $id );
 		tp_set_post_product_data( $ok, $pinfo );
-		tp_set_post_meta( $ok, $pinfo, ( $func == 'wp_update_post' ) );
+		tp_set_post_meta( $ok, $pinfo, ( $func == 'wp_update_post' ), $overwrites );
 		
 		if( $func == 'wp_insert_post' && $pinfo->{'image-url'} && tp_get_option( 'add_feed', 'post_featured_image' ) )
 			tp_add_product_thumbnail($pinfo->{'image-url'}, $ok);
@@ -249,7 +251,9 @@ function tp_set_post_product_data( $post_id, $product ) {
 	return update_post_meta( $post_id, 'tp_product_data', tp_encode_product_data( $product ) );
 }
 
-function tp_set_post_meta( $id, $pinfo, $preserve = false ) {
+function tp_set_post_meta( $id, $pinfo, $preserve = false, $overwrites = array() ) {
+	if( !is_array($overwrites) )
+		$overwrites = array( $overwrites );
 	$meta = get_option( 'tp_options_fields', array( 'fields' => array(), 'other_fields' => array() ) );
 	$opts = $meta['fields'];
 	$oldmeta = get_post_meta( $id, 'tp_product_info', true );
@@ -261,7 +265,7 @@ function tp_set_post_meta( $id, $pinfo, $preserve = false ) {
 	$vars = array();
 	foreach ( $opts as $name => $o ) {
 		// if post meta was changed and should be preserved
-		if ( $preserve && $oldmeta[$name] && $oldmeta[$name] != tp_strtopinfo( $o['value'], $oldinfo ) ) {
+		if ( $preserve && !in_array( esc_attr( $name ), $overwrites ) && $oldmeta[$name] && $oldmeta[$name] != tp_strtopinfo( $o['value'], $oldinfo ) ) {
 			$vars[$name] = $oldmeta[$name];
 		} else {
 			// update post meta

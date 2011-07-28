@@ -32,7 +32,21 @@ function tp_product_toolbox() {
 		<div class="tp-container">
 			<p><?php _e( 'Sometimes product feeds get updated and you end up with old product data on your site (e.g. price, availability). That\'s why you need to update your products from time to time.', 'tppi' ); ?></p>
 			<p><span class="warning"><?php _e( 'Warning!', 'tppi' ); ?></span> <?php _e( 'Old products from the site without a correspondant in the product feeds will be deleted.', 'tppi' ); ?></p>
-			<p><?php _e( 'Please note that the fields which were manually edited will not be updated.', 'tppi' ); ?></p>
+			<p><?php _e( 'Please note that the fields which were manually edited will not be updated unless you specify otherwise in the boxes below.', 'tppi' ); ?></p>
+<?php 
+	$product_fields = tp_get_option( 'fields', 'fields' );
+	if( !empty($product_fields) ) :
+?>			
+			<p><?php _e( 'Fields to overwrite for all products. Check the boxes next to fields you want updated even if you manually edited them.', 'tppi' ); ?>:</p>
+			<ul id="update_overwrites">
+<?php foreach( $product_fields as $field_name => $field ) : ?>
+				<li>
+					<input type="checkbox" id="tp-overwrite-<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( $field_name ); ?>" />
+					<label for="tp-overwrite-<?php echo sanitize_title( $field_name ); ?>"><?php echo esc_attr( $field['label'] ); ?></label>
+				</li>
+<?php endforeach; ?>
+			</ul>
+<?php endif; ?>
 		</div>
 		<p class="submit">
 			<input type="button" id="tp_toolbox_do_updateall" class="button-primary" value="<?php _e( 'Update all products' ); ?>" />
@@ -182,6 +196,7 @@ function TP_AJAX_wrapper_updateProduct() {
 	try {
 		$errors = array();
 		$id = ( isset( $_REQUEST['post_id'] ) && is_numeric( $_REQUEST['post_id'] ) ) ? $_REQUEST['post_id'] : false;
+		$overwrites = ( isset( $_REQUEST['overwrites'] ) && is_array( $_REQUEST['overwrites'] ) ) ? $_REQUEST['overwrites'] : false;
 		
 		if ( ! $id )
 			throw new Exception( __( 'Undefined post ID' ) );
@@ -228,7 +243,7 @@ function TP_AJAX_wrapper_updateProduct() {
 			throw new Exception( sprintf( __( 'Expired product: %1$s' ), ( $product ? tp_strtopinfo( '%brand% %title% (%id%)', $product ) : '' ) ) );
 		}
 		
-		$new_id = tp_add_product_from_feed( $product->id, $product->{'product-store-id'} );
+		$new_id = tp_add_product_from_feed( $product->id, $product->{'product-store-id'}, array(), $overwrites );
 		
 		if ( is_array( $new_id ) )
 			$errors = $new_id;
