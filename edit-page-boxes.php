@@ -24,7 +24,7 @@ function tp_product_info_inner_boxes() {
 	// check for updates
 	$s = tp_get_post_product_data( $post->ID );
 	if ( $s && is_object( $s ) && isset( $s->id ) && isset( $s->{'product_store_id'} ) ) {
-		$pr = tp_get_wrapper()->product_store_showitem( $s->{'product_store-id'}, $s->id );
+		$pr = tp_get_wrapper()->product_store_showitem( $s->{'product_store_id'}, $s->id );
 		if ( $pr ) {
 			$outdated = tp_check_product_outdated( $pr, $post );
 			if ( $outdated ) {
