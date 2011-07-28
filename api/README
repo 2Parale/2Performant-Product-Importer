@@ -29,6 +29,8 @@ Afterwards you can call any function from the TPerformant class:
 For details about each API function the documentation can be found at:
 http://help.2performant.com/API
 
+In case something goes wrong, the library throws a TPException descendant (which extends the Extension PHP class). Make sure and handle those. 
+
 
 Advanced Applications
 =====================

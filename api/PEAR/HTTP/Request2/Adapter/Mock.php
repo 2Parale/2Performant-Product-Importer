@@ -66,7 +66,7 @@ require_once 'HTTP/Request2/Adapter.php';
  * @category   HTTP
  * @package    HTTP_Request2
  * @author     Alexey Borzov <avb@php.net>
- * @version    Release: 2.0.0beta2
+ * @version    Release: 2.0.0RC1
  */
 class HTTP_Request2_Adapter_Mock extends HTTP_Request2_Adapter
 {

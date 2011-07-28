@@ -51,7 +51,7 @@ require_once 'PEAR/Exception.php';
  *
  * @category   HTTP
  * @package    HTTP_Request2
- * @version    Release: 2.0.0beta2
+ * @version    Release: 2.0.0RC1
  * @link       http://pear.php.net/pepr/pepr-proposal-show.php?id=132
  */
 class HTTP_Request2_Exception extends PEAR_Exception
@@ -115,7 +115,7 @@ class HTTP_Request2_Exception extends PEAR_Exception
  *
  * @category   HTTP
  * @package    HTTP_Request2
- * @version    Release: 2.0.0beta2
+ * @version    Release: 2.0.0RC1
  */
 class HTTP_Request2_NotImplementedException extends HTTP_Request2_Exception {}
 
@@ -131,7 +131,7 @@ class HTTP_Request2_NotImplementedException extends HTTP_Request2_Exception {}
  *
  * @category   HTTP
  * @package    HTTP_Request2
- * @version    Release: 2.0.0beta2
+ * @version    Release: 2.0.0RC1
  */
 class HTTP_Request2_LogicException extends HTTP_Request2_Exception {}
 
@@ -143,7 +143,7 @@ class HTTP_Request2_LogicException extends HTTP_Request2_Exception {}
  *
  * @category   HTTP
  * @package    HTTP_Request2
- * @version    Release: 2.0.0beta2
+ * @version    Release: 2.0.0RC1
  */
 class HTTP_Request2_ConnectionException extends HTTP_Request2_Exception {}
 
@@ -154,7 +154,7 @@ class HTTP_Request2_ConnectionException extends HTTP_Request2_Exception {}
  *
  * @category   HTTP
  * @package    HTTP_Request2
- * @version    Release: 2.0.0beta2
+ * @version    Release: 2.0.0RC1
  */
 class HTTP_Request2_MessageException extends HTTP_Request2_Exception {}
 ?>

@@ -37,7 +37,7 @@
  * @package    HTTP_Request2
  * @author     Alexey Borzov <avb@php.net>
  * @license    http://opensource.org/licenses/bsd-license.php New BSD License
- * @version    SVN: $Id: Socket.php 309682 2011-03-25 09:53:38Z avb $
+ * @version    SVN: $Id: Socket.php 309921 2011-04-03 16:43:02Z avb $
  * @link       http://pear.php.net/package/HTTP_Request2
  */
 
@@ -55,7 +55,7 @@ require_once 'HTTP/Request2/Adapter.php';
  * @category    HTTP
  * @package     HTTP_Request2
  * @author      Alexey Borzov <avb@php.net>
- * @version     Release: 2.0.0beta2
+ * @version     Release: 2.0.0RC1
  */
 class HTTP_Request2_Adapter_Socket extends HTTP_Request2_Adapter
 {
@@ -925,7 +925,9 @@ class HTTP_Request2_Adapter_Socket extends HTTP_Request2_Adapter
         $bufferSize = $this->request->getConfig('buffer_size');
 
         do {
-            $response = new HTTP_Request2_Response($this->readLine($bufferSize), true);
+            $response = new HTTP_Request2_Response(
+                $this->readLine($bufferSize), true, $this->request->getUrl()
+            );
             do {
                 $headerLine = $this->readLine($bufferSize);
                 $response->parseHeaderLine($headerLine);

@@ -1,6 +1,45 @@
 Changelog
 =========
-* Wed Jun  9 01:36:52 EEST 2010 - Radu Spineanu <radu@2performant.com
+
+* Tue Jul 12 14:56:03 EEST 2011 - Tudor Sandu <tudor.sandu@2parale.ro>
+  - 0.4.5 release
+  - added TPException class and descendants and thrown them in appropriate locations, in case of errors
+  - tweaked include path to make sure appropriate PEAR classes are loaded
+  - renamed 2performant.php to TPerformant.php
+
+* Wed Jun 15 12:30:58 EEST 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.4.4 release
+  - added stats_ functions
+
+* Tue May  3 20:23:58 EEST 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.4.3 release
+  - added admin_{affiliate,advertiser}_commissions_list which
+    return commission details
+
+* Wed Apr 20 16:58:08 EEST 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.4.2 release
+  - fixed admin request buiding to properly add host
+  - disable SSL certificate checks for https calls
+
+* Tue Apr 19 12:54:25 EEST 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.4.1 release
+  - fixed admin_ methods to properly create requests
+  - OAuth: build signature using encoded params in body
+
+* Sat Apr 16 19:49:36 EEST 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.4 release
+  - API through JSON
+
+* Thu Feb 17 00:48:52 EET 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.3.1 release
+  - add user_create method
+
+* Sun Nov 28 16:09:54 EET 2010 - Radu Spineanu <radu@2performant.com>
+  - 0.3.0 release
+  - admin_api methods
+  - changed from _merchant methods to _advertiser methods
+
+* Wed Jun  9 01:36:52 EEST 2010 - Radu Spineanu <radu@2performant.com>
   - 0.2.5 release
   - adds hooks_* methods
 

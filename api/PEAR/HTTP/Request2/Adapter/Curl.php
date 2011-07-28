@@ -37,7 +37,7 @@
  * @package    HTTP_Request2
  * @author     Alexey Borzov <avb@php.net>
  * @license    http://opensource.org/licenses/bsd-license.php New BSD License
- * @version    SVN: $Id: Curl.php 308680 2011-02-25 17:40:17Z avb $
+ * @version    SVN: $Id: Curl.php 310800 2011-05-06 07:29:56Z avb $
  * @link       http://pear.php.net/package/HTTP_Request2
  */
 
@@ -52,7 +52,7 @@ require_once 'HTTP/Request2/Adapter.php';
  * @category    HTTP
  * @package     HTTP_Request2
  * @author      Alexey Borzov <avb@php.net>
- * @version     Release: 2.0.0beta2
+ * @version     Release: 2.0.0RC1
  */
 class HTTP_Request2_Adapter_Curl extends HTTP_Request2_Adapter
 {
@@ -299,6 +299,9 @@ class HTTP_Request2_Adapter_Curl extends HTTP_Request2_Adapter
             case HTTP_Request2::METHOD_HEAD:
                 curl_setopt($ch, CURLOPT_NOBODY, true);
                 break;
+            case HTTP_Request2::METHOD_PUT:
+                curl_setopt($ch, CURLOPT_UPLOAD, true);
+                break;
             default:
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->request->getMethod());
         }
@@ -337,13 +340,11 @@ class HTTP_Request2_Adapter_Curl extends HTTP_Request2_Adapter
         }
 
         // set SSL options
-        if (0 == strcasecmp($this->request->getUrl()->getScheme(), 'https')) {
-            foreach ($this->request->getConfig() as $name => $value) {
-                if ('ssl_verify_host' == $name && null !== $value) {
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $value? 2: 0);
-                } elseif (isset(self::$sslContextMap[$name]) && null !== $value) {
-                    curl_setopt($ch, self::$sslContextMap[$name], $value);
-                }
+        foreach ($this->request->getConfig() as $name => $value) {
+            if ('ssl_verify_host' == $name && null !== $value) {
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $value? 2: 0);
+            } elseif (isset(self::$sslContextMap[$name]) && null !== $value) {
+                curl_setopt($ch, self::$sslContextMap[$name], $value);
             }
         }
 
@@ -494,7 +495,9 @@ class HTTP_Request2_Adapter_Curl extends HTTP_Request2_Adapter
             }
         }
         if (empty($this->response)) {
-            $this->response = new HTTP_Request2_Response($string, false);
+            $this->response = new HTTP_Request2_Response(
+                $string, false, curl_getinfo($ch, CURLINFO_EFFECTIVE_URL)
+            );
         } else {
             $this->response->parseHeaderLine($string);
             if ('' == trim($string)) {

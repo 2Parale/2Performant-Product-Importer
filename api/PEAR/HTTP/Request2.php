@@ -57,7 +57,7 @@ require_once 'HTTP/Request2/Exception.php';
  * @category   HTTP
  * @package    HTTP_Request2
  * @author     Alexey Borzov <avb@php.net>
- * @version    Release: 2.0.0beta2
+ * @version    Release: 2.0.0RC1
  * @link       http://tools.ietf.org/html/rfc2616#section-5
  */
 class HTTP_Request2 implements SplSubject
@@ -230,7 +230,7 @@ class HTTP_Request2 implements SplSubject
         if (!empty($method)) {
             $this->setMethod($method);
         }
-        $this->setHeader('user-agent', 'HTTP_Request2/2.0.0beta2 ' .
+        $this->setHeader('user-agent', 'HTTP_Request2/2.0.0RC1 ' .
                          '(http://pear.php.net/package/http_request2) ' .
                          'PHP/' . phpversion());
     }
