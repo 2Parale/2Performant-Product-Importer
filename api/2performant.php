@@ -979,8 +979,7 @@ class TPerformant {
 	}
 
         function simpleHttpRequest($url, $params, $method) {
-                $req = new HTTP_Request2($url, $method, array ('ssl_verify_peer' => false, 'ssl_verify_host' => false));
-                $req->setConfig($this->config['HTTP_Request2_config']);
+                $req = new HTTP_Request2($url, $method, array_merge( array ('ssl_verify_peer' => false, 'ssl_verify_host' => false), $this->config['HTTP_Request2_config'] ));
 
                 //authorize
                 $req->setAuth($this->user, $this->pass);
