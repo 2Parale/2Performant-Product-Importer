@@ -167,12 +167,12 @@ function tp_ajax_addproduct_container() {
 	$pid = $pr ? $pr->ID : 0;
 	if ( $pr ) $outdated = tp_check_product_outdated($product, $pr);
 	unset($t);
-//	$jimminy_cricket = $tp->product_store_showitem($product->{'product-store-id'}, $product->id );
+//	$jimminy_cricket = $tp->product_store_showitem($product->{'product_store_id'}, $product->id );
 //	var_dump($product, $jimminy_cricket);
 ?>
 	<li class="tp-product-list-entry<?php echo $pr ? ' existing' : ''; echo $pr && $outdated ? ' outdated' : ''; echo !($i = ++$i % 4) ? " clear" : ''; echo ($pr && $pr->post_status == 'trash') ? ' trash' : ''; ?>">
 		<p class="tp-product-image product-<?php echo $product->id; ?>">
-			<a href="<?php echo $product->url; ?>" target="_blank"><img src="<?php echo $product->{'image-url'}; ?>" title="<?php echo $product->title; ?>" class="tp-product-thumbnail" /></a>
+			<a href="<?php echo $product->url; ?>" target="_blank"><img src="<?php echo $product->{'image_url'}; ?>" title="<?php echo $product->title; ?>" class="tp-product-thumbnail" /></a>
 			<br/>
 			<a href="<?php echo $product->url; ?>" target="_blank"><small><?php _e('Click for details', 'tppi'); ?></small></a>
 		</p>
@@ -180,7 +180,7 @@ function tp_ajax_addproduct_container() {
 		<p><span class="tp-product-price product-<?php echo $product->id; ?>"><?php echo $product->price; ?></span></p>
 		
 		<input type="hidden" id="tp_product_<?php echo $product->id; ?>_id" class="tp-product-id" value="<?php echo $product->id; ?>" />
-		<input type="hidden" id="tp_product_<?php echo $product->id; ?>_feed_id" class="tp-product-feed-id" value="<?php echo $product->{'product-store-id'}; ?>" />
+		<input type="hidden" id="tp_product_<?php echo $product->id; ?>_feed_id" class="tp-product-feed-id" value="<?php echo $product->{'product_store_id'}; ?>" />
 		
 <?php $cats = wp_get_post_categories( $pid );  foreach ( $cats as $cid ) : ?>
 		<input type="hidden" class="tp-category-id" value="<?php echo $cid; ?>" />

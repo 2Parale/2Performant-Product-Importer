@@ -168,7 +168,7 @@ function TP_AJAX_wrapper_getCampaignProducts() {
 		
 		foreach ( $prods as $k => $v ) {
 			$data = tp_get_post_product_data( $v->ID );
-			if ( $campaign_id && $data && $data->{'campaign-id'} == $campaign_id ) {
+			if ( $campaign_id && $data && $data->{'campaign_id'} == $campaign_id ) {
 				$prods[$k] = $v->ID;
 			} else {
 				unset( $prods[$k] );
@@ -210,7 +210,7 @@ function TP_AJAX_wrapper_updateProduct() {
 			throw new Exception( sprintf( __('No product ID attached for post %d'), $id ) );
 			
 		$product = tp_get_post_product_data( $id );
-		if( !is_object($product) || empty($product->{'product-store-id'}) || empty($product->id) ) {
+		if( !is_object($product) || empty($product->{'product_store_id'}) || empty($product->id) ) {
 			$product = tp_get_wrapper()->product_store_products_search('approved',"@id $product_id");
 			if( empty( $product ) )
 				throw new Exception( sprintf( __('Invalid product data for ID %d'), $product_id ) );
@@ -220,7 +220,7 @@ function TP_AJAX_wrapper_updateProduct() {
 				while( is_array( $product ) ) {
 					$product = array_pop( $product );
 				}
-				if( !is_object($product) || empty($product->{'product-store-id'}) || empty($product->id) )
+				if( !is_object($product) || empty($product->{'product_store_id'}) || empty($product->id) )
 					throw new Exception( sprintf( __('Invalid product data received from API for ID %d'), $product_id ) );
 			}
 		}
@@ -228,7 +228,7 @@ function TP_AJAX_wrapper_updateProduct() {
 		try {
 			require_once 'api.php';
 			
-			$live_product = tp_get_wrapper()->product_store_showitem( $product->{'product-store-id'}, $product->id );
+			$live_product = tp_get_wrapper()->product_store_showitem( $product->{'product_store_id'}, $product->id );
 			if ( isset( $live_product->error ) )
 				$live_product = false;
 		} catch( Exception $e ) {
@@ -243,7 +243,7 @@ function TP_AJAX_wrapper_updateProduct() {
 			throw new Exception( sprintf( __( 'Expired product: %1$s' ), ( $product ? tp_strtopinfo( '%brand% %title% (%id%)', $product ) : '' ) ) );
 		}
 		
-		$new_id = tp_add_product_from_feed( $product->id, $product->{'product-store-id'}, array(), $overwrites );
+		$new_id = tp_add_product_from_feed( $product->id, $product->{'product_store_id'}, array(), $overwrites );
 		
 		if ( is_array( $new_id ) )
 			$errors = $new_id;

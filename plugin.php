@@ -129,10 +129,10 @@ function tp_product_shortcode( $atts ) {
 		ob_start();
 ?>
 	<div class="tp-product-info">
-<?php if( isset($pinfo->{'image-url'} ) ) : ?>
+<?php if( isset($pinfo->{'image_url'} ) ) : ?>
 		<div class="tp-product-thumbnail">
 			<a href="<?php echo esc_attr( $pinfo->aff_link ); ?>">
-				<img src="<?php echo esc_attr( $pinfo->{'image-url'} ); ?>" />
+				<img src="<?php echo esc_attr( $pinfo->{'image_url'} ); ?>" />
 			</a>
 		</div>
 <?php endif; ?>

@@ -68,12 +68,12 @@ function tp_add_product_from_feed( $id, $feed, $category = array(), $overwrites 
 		tp_set_post_product_data( $ok, $pinfo );
 		tp_set_post_meta( $ok, $pinfo, ( $func == 'wp_update_post' ), $overwrites );
 		
-		if( $func == 'wp_insert_post' && $pinfo->{'image-url'} && tp_get_option( 'add_feed', 'post_featured_image' ) )
-			tp_add_product_thumbnail($pinfo->{'image-url'}, $ok);
+		if( $func == 'wp_insert_post' && $pinfo->{'image_url'} && tp_get_option( 'add_feed', 'post_featured_image' ) )
+			tp_add_product_thumbnail($pinfo->{'image_url'}, $ok);
 		
-		if( $func == 'wp_insert_post' && is_object( $pinfo->{'image-urls'} ) && tp_get_option( 'add_feed', 'post_gallery' ) )
-		if( isset( $pinfo->{'image-urls'}->{'image-url'} ) && is_array( $pinfo->{'image-urls'}->{'image-url'} ) )
-			tp_add_product_gallery($pinfo->{'image-urls'}->{'image-url'}, $ok);
+		if( $func == 'wp_insert_post' && is_object( $pinfo->{'image_urls'} ) && tp_get_option( 'add_feed', 'post_gallery' ) )
+		if( isset( $pinfo->{'image_urls'}->{'image_url'} ) && is_array( $pinfo->{'image_urls'}->{'image_url'} ) )
+			tp_add_product_gallery($pinfo->{'image_urls'}->{'image_url'}, $ok);
 		
 		do_action( "tp_after_$action", get_post($ok) );
 		
@@ -176,9 +176,9 @@ function tp_check_product_outdated( $product, $post = null ) {
 	 
 //	var_dump($product, $s);
 //	var_dump(get_post_meta( $post->ID, 'tp_product_data', true ), $s);
-//	var_dump($product->{'updated-at'}, $s->{'updated-at'}, $product->{'updated-at'} != $s->{'updated-at'});
+//	var_dump($product->{'updated_at'}, $s->{'updated_at'}, $product->{'updated_at'} != $s->{'updated_at'});
 	
-	return ( $product->{'updated-at'} != $s->{'updated-at'} );
+	return ( $product->{'updated_at'} != $s->{'updated_at'} );
 	
 //	$errors = array();
 //	
@@ -199,8 +199,8 @@ function tp_check_product_outdated( $product, $post = null ) {
 //		}
 //		update_post_meta( $ok, 'tp_product_info', $vars );
 //		
-//		if( $func == 'wp_insert_post' && $pinfo->{'image-url'} )
-//			tp_add_product_thumbnail($pinfo->{'image-url'}, $ok);
+//		if( $func == 'wp_insert_post' && $pinfo->{'image_url'} )
+//			tp_add_product_thumbnail($pinfo->{'image_url'}, $ok);
 //		
 //		return $ok;
 //	} catch(Exception $e) {

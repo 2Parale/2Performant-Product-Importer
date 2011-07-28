@@ -23,8 +23,8 @@ function tp_product_info_inner_boxes() {
 	
 	// check for updates
 	$s = tp_get_post_product_data( $post->ID );
-	if ( $s && is_object( $s ) && isset( $s->id ) && isset( $s->{'product-store-id'} ) ) {
-		$pr = tp_get_wrapper()->product_store_showitem( $s->{'product-store-id'}, $s->id );
+	if ( $s && is_object( $s ) && isset( $s->id ) && isset( $s->{'product_store_id'} ) ) {
+		$pr = tp_get_wrapper()->product_store_showitem( $s->{'product_store-id'}, $s->id );
 		if ( $pr ) {
 			$outdated = tp_check_product_outdated( $pr, $post );
 			if ( $outdated ) {
@@ -156,7 +156,7 @@ function tp_ajax_updateproduct() {
 	$post = get_post( $id );
 	$postdata = tp_get_post_product_data( $post->ID );
 	
-	$res = tp_add_product_from_feed( $postdata->id, $postdata->{'product-store-id'}, wp_get_post_categories( $post->ID ) );
+	$res = tp_add_product_from_feed( $postdata->id, $postdata->{'product_store_id'}, wp_get_post_categories( $post->ID ) );
 	
 	if( is_array($res) ) {
 		foreach ( $res as $err ) {

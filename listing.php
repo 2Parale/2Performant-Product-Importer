@@ -23,14 +23,14 @@ function tp_custom_columns( $column, $id ) {
 	if( $column == 'tp_updated' ) {
 		$prod = tp_get_post_product_data( $id );
 		
-		if ( tp_check_product_outdated( tp_get_wrapper()->product_store_showitem( $prod->{'product-store-id'}, $prod->id ), get_post( $id ) ) ) {
+		if ( tp_check_product_outdated( tp_get_wrapper()->product_store_showitem( $prod->{'product_store_id'}, $prod->id ), get_post( $id ) ) ) {
 ?>
 			<input type="hidden" value="<?php echo $id ?>" class="tp-update-product-id" />
 			No. <a href="#" id="tp_update_product_action_<?php echo $id; ?>" class="tp-update-product-info">Update now</a>
 			<input type="hidden" id="tp_ajax_nonce_<?php echo $id; ?>" value="<?php echo wp_create_nonce( 'tp_ajax_nonce' ); ?>" />
 <?php
 		} else {
-			echo "Yes (".date(get_option('date_format').' '.get_option('time_format'), strtotime($prod->{'updated-at'})).")";
+			echo "Yes (".date(get_option('date_format').' '.get_option('time_format'), strtotime($prod->{'updated_at'})).")";
 		}
 	} elseif ( $column == 'tp_thumbnail' ) {
 		echo get_the_post_thumbnail( $id, array( 60, 60 ) );

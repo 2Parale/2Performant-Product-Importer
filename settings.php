@@ -91,7 +91,7 @@ function _tp_get_settings( $section = false, $setting = false ) {
 							'value' => '<div class="tp-product-info">
 	<div class="tp-product-thumbnail">
 		<a href="%aff_link%">
-			<img src="%image-url%" />
+			<img src="%image_url%" />
 		</a>
 	</div>
 	<div class="tp-product-meta">
@@ -290,26 +290,26 @@ function tp_render_post_type_select( $setting ) {
 $field_names = array(
 	'brand',
 	'price',
-	'product-store-id',
+	'product_store_id',
 	'category',
-	'created-at',
+	'created_at',
 	'subcategory',
 	'delta',
 	'title',
-	'campaign-id',
-	'updated-at',
+	'campaign_id',
+	'updated_at',
 	'url',
 	'id',
-	'other-data',
-	'update-type',
+	'other_data',
+	'update_type',
 	'caption',
 	'clicks',
 	'promoted',
-	'unique-code',
+	'unique_code',
 	'description',
 	'prid',
 	'active',
-	'image-url',
+	'image_url',
 	'image_urls',
 	'aff_link'
 );
