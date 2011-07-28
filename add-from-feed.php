@@ -110,6 +110,15 @@ function tp_product_add_from_feed() {
 			<?php endif; ?>
 		</div>
 	</div>
+<?php } catch(TPException $e) {
+		ob_end_clean(); 
+?>
+	<div id="setting-error-options_error" class="error settings-error">
+		<p><?php _e(get_class($e) . ': ' . $e->getMessage(), 'tppi'); ?></p>
+<?php if($e->getData()) : ?>
+		<p><?php _e( 'Additional data:', 'tppi' ); ?><br/><textarea cols="80"><?php var_dump($e->getData()); ?></textarea></p>
+<?php endif; ?>
+	</div>
 <?php } catch(Exception $e) {
 		ob_end_clean(); 
 ?>
