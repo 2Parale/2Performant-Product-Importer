@@ -75,7 +75,7 @@ function tp_add_product_from_feed( $id, $feed, $category = array(), $overwrites 
 		if( isset( $pinfo->{'image_urls'}->{'image_url'} ) && is_array( $pinfo->{'image_urls'}->{'image_url'} ) )
 			tp_add_product_gallery($pinfo->{'image_urls'}->{'image_url'}, $ok);
 		
-		do_action( "tp_after_$action", get_post($ok) );
+		do_action( "tp_after_$action", get_post($ok), $pinfo );
 		
 		return $ok;
 	} catch(Exception $e) {
