@@ -143,8 +143,7 @@ function _tp_get_settings( $section = false, $setting = false ) {
 					'description' => 'The connection adapter class. Do not change unless you know what you are doing.',
 					'options' => array(
 						'curl' => 'cURL',
-						'socket' => 'Socket',
-						'mock' => 'Mock'
+						'socket' => 'Socket'
 					),
 					'default' => 'socket'
 				)
