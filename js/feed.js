@@ -63,7 +63,7 @@
 				var wrapper = $(this).tpplProductWrapper(),
 					destination = wrapper.children('.tp-product-toolbox').first(),
 					toolbox = $('#tp-insert-toolbox'),
-					cats = wrapper.data('cats');
+					cats = wrapper.data('cats') || [];
 				wrapper.addClass('expanded');
 				toolbox.detachToolbox(function(){
 					toolbox.find(':checkbox[name^="post_category"]').each(function(){
