@@ -3,8 +3,8 @@ Contributors: 2parale, tetele
 Donate link: 
 Tags: affiliate, posts, commerce, products
 Requires at least: 3.0
-Tested up to: 3.2
-Stable tag: 0.9.8
+Tested up to: 3.2.1
+Stable tag: 0.9.8.1
 
 Imports products from product feeds in 2Performant affiliate networks, such as 2Parale.ro.
 
@@ -43,6 +43,9 @@ There's a bug/feature in Wordpress which gets in the way of the process. It's do
 
 == Changelog ==
 
+= 0.9.8.1 =
+* **Bugfix** Infinite scroll issue (Add button no longer works after scroll in some situations)
+
 = 0.9.8 =
 * **Compatibility fixes** for WordPress 3.2
 
@@ -72,6 +75,9 @@ There's a bug/feature in Wordpress which gets in the way of the process. It's do
 * **Bugfix** Does not delete regular posts on update
 
 == Upgrade Notice ==
+
+= 0.9.8.1 =
+Adding items now works after scrolling through the first 24 items on all browsers.
 
 = 0.9.8 =
 Compatibility with WP 3.2
