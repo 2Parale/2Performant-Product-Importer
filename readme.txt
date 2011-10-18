@@ -3,8 +3,8 @@ Contributors: 2parale, tetele
 Donate link: 
 Tags: affiliate, posts, commerce, products
 Requires at least: 3.0
-Tested up to: 3.2
-Stable tag: 0.9.8
+Tested up to: 3.2.1
+Stable tag: 0.9.8.1
 
 Imports products from product feeds in 2Performant affiliate networks, such as 2Parale.ro.
 
@@ -42,6 +42,9 @@ Actually, no. But there's a reason for it: you can customize the output dependin
 There's a bug/feature in Wordpress which gets in the way of the process. It's documented [here](http://core.trac.wordpress.org/ticket/11831). The quickfix is to add `define('ALTERNATE_WP_CRON', true);` to `wp-config.php`.
 
 == Changelog ==
+
+= 0.9.8.1 =
+* **Bugfix** Infinite scroll issue (Add button no longer works after scroll in some situations)
 
 = 0.9.8 =
 * **Compatibility fixes** for WordPress 3.2
