@@ -76,6 +76,9 @@ There's a bug/feature in Wordpress which gets in the way of the process. It's do
 
 == Upgrade Notice ==
 
+= 0.9.8.1 =
+Adding items now works after scrolling through the first 24 items on all browsers.
+
 = 0.9.8 =
 Compatibility with WP 3.2
 
