@@ -108,7 +108,7 @@ function tp_register_settings() {
 		foreach ( $section['settings'] as $setting_id => $setting ) {
 			$setting['id'] = "tp_options_{$section_id}_{$setting_id}";
 			$setting['name'] = "tp_options_{$section_id}[{$setting_id}]";
-			$setting['value'] = isset( $values[$setting_id] ) ? $values[$setting_id] : ( $values[$setting_id] = isset( $setting['default'] ) ? $setting['default'] : null );
+			$setting['value'] = isset( $values[$setting_id] ) ? $values[$setting_id] : ( $values[$setting_id] = isset( $setting['default'] ) && $setting['type'] != 'checkbox' ? $setting['default'] : null );
 			add_settings_field( "tp_options_{$section_id}_{$setting_id}", __( $setting['label'], 'tppi' ), 'tp_render_field', 'tp-options', "tp_options_{$section_id}", $setting );			
 		}
 		if ( $defaults )
