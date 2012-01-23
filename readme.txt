@@ -6,7 +6,7 @@ Requires at least: 3.0
 Tested up to: 3.3.1
 Stable tag: 0.9.9
 
-Imports products from product feeds in 2Performant affiliate networks, such as 2Parale.ro.
+Imports products from product feeds in 2Performant affiliate networks, such as 2Parale.ro or 2Leva.bg.
 
 == Description ==
 
