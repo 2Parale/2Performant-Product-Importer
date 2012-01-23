@@ -13,7 +13,10 @@ function tp_add_product_box() {
 
 	$post_type = tp_get_post_type();
 	add_meta_box( 'tp_product_info', __( '2Performant Product Information', 'tppi' ), 'tp_product_info_inner_boxes', $post_type, 'normal', 'high' );
-	
+}
+
+add_action('admin_enqueue_scripts', 'tp_enqueue_script_edit_metabox');
+function tp_enqueue_script_edit_metabox() {
 	wp_enqueue_script( 'tp-edit-script' );
 }
 
