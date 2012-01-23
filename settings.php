@@ -52,7 +52,7 @@ function tp_register_settings() {
 					'type' => 'checkbox',
 					'label' => 'Trash expired products',
 					'description' => 'Check this to send posts containing products which are no longer available to trash when updating all products',
-					'default' => true
+					'default' => false
 				)
 			)
 		),

@@ -215,7 +215,7 @@ function TP_AJAX_wrapper_updateProduct() {
 		}
 		
 		if ( ! $live_product ) {
-			if( tp_get_option( 'add_feed', 'trash_expired', true ) ) {
+			if( tp_get_option( 'add_feed', 'trash_expired', false ) ) {
 				// Delete the post
 				wp_delete_post( $id );
 			}
