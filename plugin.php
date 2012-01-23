@@ -3,7 +3,7 @@
 Plugin Name: 2Performant Product Importer
 Plugin URI: http://blog.2parale.ro/wp-plugin-2performant-product-importer-en/
 Description: Imports products from product feeds in 2Performant affiliate networks. It requires authentication as an affiliate in one of these networks. Products are imported as individual posts (or other custom post types, configurable) which can use several custom fields based on product info from the feeds. 
-Version: 0.9.8.1
+Version: 0.9.9
 Author: 2Parale
 Author URI: http://www.2parale.ro/
 License: GPL2
@@ -13,7 +13,7 @@ License: GPL2
 //error_reporting(E_ALL);
 //define('SCRIPT_DEBUG', true);
 
-define('TPPI_VERSION', 'v0.9.8.1');
+define('TPPI_VERSION', 'v0.9.9');
 
 if ( is_admin() ) :
 
@@ -46,6 +46,7 @@ function tp_plugin_menu() {
 	wp_register_script( 'tp-settings-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/settings.js', array( 'jquery' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-feed-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/feed.js', array( 'jquery', 'tp-jquery-product-list', 'wp-lists' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-edit-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/edit.js', array( 'jquery' ), TPPI_VERSION );
+	wp_register_script( 'tp-insert-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/insert.js', array( 'jquery' ), TPPI_VERSION );
 	wp_register_script( 'tp-listing-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/listing.js', array( 'jquery' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-toolbox-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/js/toolbox.js', array( 'jquery', 'jquery-ui-progressbar' ), TPPI_VERSION, true );
 	wp_register_script( 'tp-tinymce-insert-script', '/wp-content/plugins/'.dirname(plugin_basename(__FILE__)).'/tinymce-insert/js/insert.js', array( 'jquery', 'tp-jquery-product-list' ), TPPI_VERSION );

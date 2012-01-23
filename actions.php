@@ -75,8 +75,8 @@ function tp_add_product_thumbnail( $url, $post_id ) {
 	$img = imagecreatefromstring( file_get_contents( $url ) );
 	$upload_dir = wp_upload_dir();
 	$path = $upload_dir['path'];
-	$filename = $path . '/' . $post_id . '.png';
-	if(!imagepng($img, $filename))
+	$filename = $path . '/' . $post_id . '.jpg';
+	if(!imagejpeg($img, $filename))
 		return false;
 	
 	// add as media

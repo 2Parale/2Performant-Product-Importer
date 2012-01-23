@@ -16,7 +16,11 @@ function tp_edit_addbuttons() {
 		add_filter( 'mce_external_plugins', 'tp_add_tinymce_plugin' );
 		add_filter( 'mce_buttons', 'tp_register_insert_product_button' );
 	}
-	
+}
+
+add_action('admin_enqueue_scripts', 'tp_enqueue_script_edit_insert');
+
+function tp_enqueue_script_edit_insert() {
 	wp_enqueue_script( 'tp-insert-script' );
 }
  
