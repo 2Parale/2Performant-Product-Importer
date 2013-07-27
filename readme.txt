@@ -1,10 +1,10 @@
 === 2Performant Product Importer ===
-Contributors: 2parale, tetele
+Contributors: 2parale, tetele, alecslupu
 Donate link: 
 Tags: affiliate, posts, commerce, products
 Requires at least: 3.0
-Tested up to: 3.3.1
-Stable tag: 0.9.9
+Tested up to: 3.5.2
+Stable tag: 0.9.10
 
 Imports products from product feeds in 2Performant affiliate networks, such as 2Parale.ro.
 
