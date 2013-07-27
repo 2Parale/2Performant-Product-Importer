@@ -1,6 +1,88 @@
 Changelog
 =========
-* Wed Jun  9 01:36:52 EEST 2010 - Radu Spineanu <radu@2performant.com
+* Mon Mar 18 14:19:22 EST 2013 - Tudor Sandu <tudor.sandu@2parale.ro>
+  - modified campaigns_listforaffiliate method according to API server changes
+  - tagged v0.6.1
+
+* Sun Mar 17 14:09:50 EST 2013 - Alex Lupu <alexandru.lupu@2parale.ro>
+  - fixed Authentication error when using multiple pages 
+
+* Tue Mar 12 13:21:43 EST 2013 - Tudor Sandu <tudor.sandu@2parale.ro>
+  - 0.6 release
+  - added version support and user-agent reporting for API wrapper
+  - added paging for campaigns/listforaffiliate and affiliates/listforadvertiser
+
+* Mon Oct 15 20:09:43 EST 2012 - Tudor Sandu <tudor.sandu@2parale.ro>
+  - 0.5.6 release
+  - added paging for commission listing methods
+  - fixed improper merge for v0.5.4, which fixed commission updating
+
+* Mon Oct 15 13:36:22 EST 2012 - Tudor Sandu <tudor.sandu@2parale.ro>
+  - 0.5.5 release
+  - updated PEAR libraries to most recent versions
+
+* Thu Nov 03 20:13:44 EST 2011 - Tudor Sandu <tudor.sandu@2parale.ro>
+  - 0.5.4 release
+  - fixed a bunch of errors regarding OAuth signatures for POST requests
+
+* Thu Nov 03 20:13:44 EST 2011 - Tudor Sandy <tudor.sandu@2parale.ro>
+  - 0.5.3 release
+  - added transport exceptions
+  - fixed bug: DELETE requests return no values
+
+* Thu Oct 13 20:06:36 EEST 2011 - Tudor Sandu <tudor.sandu@2parale.ro>
+  - 0.5.2 release
+  - accept any 2xx HTTP status code instead of just 200
+
+* Wed Oct 05 22:47:12 EEST 2011 - Tudor Sandu <tudor.sandu@2parale.ro>
+  - 0.5.1 release
+  - corrected admin invoices URLs
+
+* Wed Sep 28 17:28:42 EEST 2011 - Tudor Sandu <tudor.sandu@2parale.ro>
+  - 0.5 release
+  - Better exception messages
+  - Allow redirects on requests (for admin requests)
+  - Added admin_affiliate_invoice_show and admin_advertiser_invoice_show methods
+
+* Fri Sep 09 03:18:22 EEST 2011 - Tudor Sandu <tudor.sandu@2parale.ro>
+  - 0.5 RC1
+  - added TPException class and descendants and thrown them in appropriate locations, in case of errors
+  - tweaked include path to make sure appropriate PEAR classes are loaded
+  - renamed 2performant.php to TPerformant.php for easy framework integration
+
+* Wed Jun 15 12:30:58 EEST 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.4.4 release
+  - added stats_ functions
+
+* Tue May  3 20:23:58 EEST 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.4.3 release
+  - added admin_{affiliate,advertiser}_commissions_list which
+    return commission details
+
+* Wed Apr 20 16:58:08 EEST 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.4.2 release
+  - fixed admin request buiding to properly add host
+  - disable SSL certificate checks for https calls
+
+* Tue Apr 19 12:54:25 EEST 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.4.1 release
+  - fixed admin_ methods to properly create requests
+  - OAuth: build signature using encoded params in body
+
+* Sat Apr 16 19:49:36 EEST 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.4 release
+  - API through JSON
+
+* Thu Feb 17 00:48:52 EET 2011 - Radu Spineanu <radu@2performant.com>
+  - 0.3.1 release
+  - add user_create method
+
+* Sun Nov 28 16:09:54 EET 2010 - Radu Spineanu <radu@2performant.com>
+  - 0.3.0 release
+  - admin_api methods
+  - changed from _merchant methods to _advertiser methods
+
+* Wed Jun  9 01:36:52 EEST 2010 - Radu Spineanu <radu@2performant.com>
   - 0.2.5 release
   - adds hooks_* methods
 

@@ -33,13 +33,13 @@ require_once 'HTTP/OAuth/Consumer/Exception/InvalidResponse.php';
  *
  * <code>
  * $consumer = new HTTP_OAuth_Consumer('key', 'secret');
- * $consumer->getRequestToken('http://example.com/oauth/request_token, $callback);
+ * $consumer->getRequestToken('http://example.com/oauth/request_token', $callback);
  *
  * // Store tokens
  * $_SESSION['token']        = $consumer->getToken();
  * $_SESSION['token_secret'] = $consumer->getTokenSecret();
  *
- * $url = $consumer->getAuthorizationUrl('http://example.com/oauth/authorize');
+ * $url = $consumer->getAuthorizeUrl('http://example.com/oauth/authorize');
  * http_redirect($url); // function from pecl_http
  *
  * // When they come back via the $callback url
@@ -118,6 +118,13 @@ class HTTP_OAuth_Consumer extends HTTP_OAuth
     protected $lastRequest = null;
 
     /**
+     * Instance of the last response received
+     * 
+     * @var HTTP_OAuth_Consumer_Response
+     */
+    protected $lastResponse =null;
+
+    /**
      * Construct
      *
      * @param string $key         Consumer key
@@ -149,8 +156,7 @@ class HTTP_OAuth_Consumer extends HTTP_OAuth
      */
     public function getRequestToken($url, $callback = 'oob',
         array $additional = array(), $method = 'POST'
-    )
-    {
+    ) {
         $this->debug('Getting request token from ' . $url);
         $additional['oauth_callback'] = $callback;
 
@@ -181,14 +187,15 @@ class HTTP_OAuth_Consumer extends HTTP_OAuth
      */
     public function getAccessToken($url, $verifier = '',
         array $additional = array(), $method = 'POST'
-    )
-    {
+    ) {
         if ($this->getToken() === null || $this->getTokenSecret() === null) {
             throw new HTTP_OAuth_Exception('No token or token_secret');
         }
 
         $this->debug('Getting access token from ' . $url);
-        $additional['oauth_verifier'] = $verifier;
+        if ($verifier !== null) {
+            $additional['oauth_verifier'] = $verifier;
+        }
 
         $this->debug('verifier: ' . $verifier);
         $response = $this->sendRequest($url, $additional, $method);
@@ -206,10 +213,10 @@ class HTTP_OAuth_Consumer extends HTTP_OAuth
     /**
      * Get authorize url
      *
-     * @param string $url        Authorization url
+     * @param string $url        Authorize url
      * @param array  $additional Additional parameters for the auth url
      *
-     * @return string Authorization url
+     * @return string Authorize url
      */
     public function getAuthorizeUrl($url, array $additional = array())
     {
@@ -247,11 +254,10 @@ class HTTP_OAuth_Consumer extends HTTP_OAuth
         $req->setMethod($method);
         $req->setSecrets($this->getSecrets());
         $req->setParameters($params);
-        $res = $req->send();
+        $this->lastResponse = $req->send();
+        $this->lastRequest  = $req;
 
-        $this->lastRequest = $req;
-
-        return $res;
+        return $this->lastResponse;
     }
 
     /**
@@ -347,7 +353,7 @@ class HTTP_OAuth_Consumer extends HTTP_OAuth
      *
      * @return array Array possible secrets
      */
-    protected function getSecrets()
+    public function getSecrets()
     {
         return array($this->secret, (string) $this->tokenSecret);
     }
@@ -400,6 +406,16 @@ class HTTP_OAuth_Consumer extends HTTP_OAuth
     public function getLastRequest()
     {
         return $this->lastRequest;
+    }
+
+    /**
+     * Gets the most recent HTTP_OAuth_Consumer_Response object
+     * 
+     * @return HTTP_OAuth_Consumer_Response|null
+     */
+    public function getLastResponse()
+    {
+        return $this->lastResponse;
     }
 }
 

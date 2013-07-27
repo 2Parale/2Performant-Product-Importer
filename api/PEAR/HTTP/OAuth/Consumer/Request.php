@@ -117,8 +117,9 @@ class HTTP_OAuth_Consumer_Request extends HTTP_OAuth_Message
         default:
             if ($object instanceof Log) {
                 HTTP_OAuth::attachLog($object);
-                $this->getHTTPRequest2()
-                     ->attach(new HTTP_Request2_Observer_Log($object));
+                $this->getHTTPRequest2()->attach(
+                    new HTTP_Request2_Observer_Log($object)
+                );
             }
             break;
         }
@@ -208,6 +209,23 @@ class HTTP_OAuth_Consumer_Request extends HTTP_OAuth_Message
     public function send()
     {
         $this->buildRequest();
+        $request = $this->getHTTPRequest2();
+
+        // Hack for the OAuth's spec + => %20 and HTTP_Request2
+        // HTTP_Request2 uses http_build_query() which does spaces
+        // as '+' and not '%20'
+        $headers     = $request->getHeaders();
+        $contentType = isset($headers['content-type'])
+                       ? $headers['content-type'] : '';
+        if ($this->getMethod() == 'POST'
+            && $contentType == 'application/x-www-form-urlencoded'
+        ) {
+
+            $body = $this->getHTTPRequest2()->getBody();
+            $body = str_replace('+', '%20', $body);
+            $this->getHTTPRequest2()->setBody($body);
+        }
+
         try {
             $response = $this->getHTTPRequest2()->send();
         } catch (Exception $e) {
@@ -233,11 +251,17 @@ class HTTP_OAuth_Consumer_Request extends HTTP_OAuth_Message
         $this->oauth_timestamp = time();
         $this->oauth_nonce     = md5(microtime(true) . rand(1, 999));
         $this->oauth_version   = '1.0';
-        $this->oauth_signature = $sig->build($this->getMethod(),
-                                             $this->getUrl()->getURL(),
-                                             $this->getParameters(),
-                                             $this->secrets[0],
-                                             $this->secrets[1]);
+        $params                = array_merge(
+            $this->getParameters(),
+            $this->getUrl()->getQueryVariables()
+        );
+        $this->oauth_signature = $sig->build(
+            $this->getMethod(),
+            $this->getUrl()->getURL(),
+            $params,
+            $this->secrets[0],
+            $this->secrets[1]
+        );
 
         $params = $this->getOAuthParameters();
         switch ($this->getAuthType()) {
@@ -318,9 +342,13 @@ class HTTP_OAuth_Consumer_Request extends HTTP_OAuth_Message
      */
     public function __call($method, $args)
     {
-        if (method_exists($this->getHTTPRequest2(), $method)) {
-            return call_user_func_array(array($this->getHTTPRequest2(), $method),
-                                        $args);
+        $httpRequest2 = $this->getHTTPRequest2();
+
+        if (is_callable(array($httpRequest2, $method))) {
+            return call_user_func_array(
+                array($httpRequest2, $method),
+                $args
+            );
         }
 
         throw new BadMethodCallException($method);

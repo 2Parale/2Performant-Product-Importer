@@ -6,7 +6,7 @@ Requires at least: 3.0
 Tested up to: 3.3.1
 Stable tag: 0.9.9
 
-Imports products from product feeds in 2Performant affiliate networks, such as 2Parale.ro or 2Leva.bg.
+Imports products from product feeds in 2Performant affiliate networks, such as 2Parale.ro.
 
 == Description ==
 
@@ -42,6 +42,10 @@ Actually, no. But there's a reason for it: you can customize the output dependin
 There's a bug/feature in Wordpress which gets in the way of the process. It's documented [here](http://core.trac.wordpress.org/ticket/11831). The quickfix is to add `define('ALTERNATE_WP_CRON', true);` to `wp-config.php`.
 
 == Changelog ==
+
+= 0.9.10 = 
+* **Updated** Updated the 2Performant api to v0.6.1
+* **Bugfix** Fixed the search box for some of the feeds 
 
 = 0.9.9 =
 * **Bugfix** Some functions in post edit page didn't work in WP 3.3+

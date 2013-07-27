@@ -145,11 +145,11 @@ function tp_ajax_addproduct_container() {
 	if ( $pr ) $outdated = tp_check_product_outdated($product, $pr);
 	unset($t);
 //	$jimminy_cricket = $tp->product_store_showitem($product->{'product-store-id'}, $product->id );
-//	var_dump($product, $jimminy_cricket);
+	// var_dump($product);
 ?>
 	<li class="tp-product-list-entry<?php echo $pr ? ' existing' : ''; echo $pr && $outdated ? ' outdated' : ''; echo !($i = ++$i % 4) ? " clear" : ''; echo ($pr && $pr->post_status == 'trash') ? ' trash' : ''; ?>">
 		<p class="tp-product-image product-<?php echo $product->id; ?>">
-			<a href="<?php echo $product->url; ?>" target="_blank"><img src="<?php echo $product->{'image-url'}; ?>" title="<?php echo $product->title; ?>" class="tp-product-thumbnail" /></a>
+			<a href="<?php echo $product->url; ?>" target="_blank"><img src="<?php echo reset($product->image_urls); ?>" title="<?php echo $product->title; ?>" class="tp-product-thumbnail" /></a>
 			<br/>
 			<a href="<?php echo $product->url; ?>" target="_blank"><small><?php _e('Click for details', 'tppi'); ?></small></a>
 		</p>
