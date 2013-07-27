@@ -13,7 +13,7 @@ License: GPL2
 //error_reporting(E_ALL);
 //define('SCRIPT_DEBUG', true);
 
-define('TPPI_VERSION', 'v0.9.9');
+define('TPPI_VERSION', 'v0.9.10');
 
 if ( is_admin() ) :
 

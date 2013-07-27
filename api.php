@@ -42,6 +42,8 @@ function tp_verify_connection( &$tp = false ) {
 				trigger_error( 'API response: ' . ob_get_contents(), E_USER_WARNING );
 				ob_end_clean();
 			}
+		} catch( TPException_Transport $e ){ 
+			$errors[] = 'Invalid username and password';
 		} catch( HTTP_Request2_Exception $e ) {
 			$errors[] = 'Invalid API URL';
 		}
@@ -78,31 +80,19 @@ function tp_feed_dropdown( $options = array() ) {
 	
 	foreach ( $categories as $category_name => $category ) :
 	usort( $category, 'compareByName' );
-	/*
-?>
-	<optgroup label="<?php echo $category_name; ?>">
-<?php
-	//*/	
-	foreach($category as $campaign) :
-	$feeds = fix_result($tp->product_stores_list($campaign->id));
+	
+		foreach($category as $campaign) :
+			$feeds = fix_result($tp->product_stores_list($campaign->id));
 
-	if(!empty($feeds)) 
-			// $campaign->id = reset($campaign->id);
-?>
-			<option value="c_<?php echo $campaign->id; ?>" class="level-0"<?php echo $options['value'] == "c_{$campaign->id}" ? ' selected="selected"' : ''; ?>><?php echo htmlspecialchars($campaign->name); ?></option>
+			if(!empty($feeds)) ?>
+				<option value="c_<?php echo $campaign->id; ?>" class="level-0"<?php echo $options['value'] == "c_{$campaign->id}" ? ' selected="selected"' : ''; ?>><?php echo htmlspecialchars($campaign->name); ?></option>
+			<?php
+			usort($feeds, 'compareById');
+			foreach($feeds as $feed) :?>
+				<option value="f_<?php echo $feed->id; ?>" class="level-1"<?php echo $options['value'] == "f_{$feed->id}" ? ' selected="selected"' : ''; ?>>&nbsp;&nbsp;&nbsp; <?php echo htmlspecialchars($feed->name); ?></option>
 <?php
-	usort($feeds, 'compareById');
-	foreach($feeds as $feed) :
-?>
-			<option value="f_<?php echo $feed->id; ?>" class="level-1"<?php echo $options['value'] == "f_{$feed->id}" ? ' selected="selected"' : ''; ?>>&nbsp;&nbsp;&nbsp; <?php echo htmlspecialchars($feed->name); ?></option>
-<?php
-	endforeach;
-	endforeach;
-	/*
-?>
-	</optgroup>
-<?php
-	//*/
+			endforeach;
+		endforeach;
 	endforeach;
 ?>
 </select>
