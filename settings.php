@@ -83,6 +83,19 @@ function tp_register_settings() {
 			)
 		),
 
+		'bitly_options' => array(
+			'label' => 'Bit.ly API options',
+			'settings' => array(
+				'login' => array(
+					'type' => 'text',
+					'label' => 'Set the login'
+				),
+				'api_key' => array(
+					'type' => 'text',
+					'label' => 'Set the API KEY'
+				)
+			)
+		),
 
 
 		'fields' => array(

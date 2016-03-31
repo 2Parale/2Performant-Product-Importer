@@ -112,9 +112,10 @@ function tp_the_product_field( $key, $id = false ) {
 //automatically create bit.ly url for wordpress widgets
 function bitly($url)
 {
+	$api = get_option('tp_options_bitly_options');
 	//login information
-	$login = 'cxdany';   //your bit.ly login
-	$apikey = 'R_4f2a9e663ea740d8bab7d774fb24228d'; //add your bit.ly API
+	$login = $api['login'];   //your bit.ly login
+	$apikey = $api['api_key']; //add your bit.ly API
 	$format = 'json';   //choose between json or xml
 	$version = '2.0.1';
 	//generate the URL
