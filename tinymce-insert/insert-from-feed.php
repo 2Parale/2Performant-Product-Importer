@@ -35,6 +35,47 @@ var tpBaseUrl = '<?php echo get_bloginfo('url').'/wp-content/plugins/'.dirname(d
 .container {
 	margin: 1em;
 }
+.save-all {
+	position: fixed;
+	right: 32px;
+	top: 5px;
+
+
+}
+.btn {
+	display: inline-block;
+	padding: 6px 12px;
+	margin-bottom: 0;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.42857143;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	-ms-touch-action: manipulation;
+	touch-action: manipulation;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	background-image: none;
+	border: 1px solid transparent;
+	border-radius: 4px;
+}
+.btn-success {
+	color: #fff;
+	background-color: #5cb85c;
+	border-color: #4cae4c;
+}
+.btn-success:hover {
+	color: #fff;
+	background-color: #449d44;
+	border-color: #398439;
+}
+.inserted {
+	background: #4cae4c;
+}
 </style>
 <?php
 do_action('admin_print_styles');
@@ -46,6 +87,8 @@ do_action('admin_head');
 <?php //*/ ?>
 </head>
 <body<?php if ( isset($GLOBALS['body_id']) ) echo ' id="' . $GLOBALS['body_id'] . '"'; ?>>
+
+<button class="save-all btn btn-success">Salveaza</button>
 
 <div class="container">
 
@@ -70,22 +113,30 @@ do_action('admin_head');
 <?php else : ?>
 		<script type="text/javascript">
 		//<![CDATA[
-		jQuery.tp_insertProduct = {
+
+		jQuery(document).on('click', '.save-all', function(){
+			var win = window.dialogArguments || opener || parent || top;
+			//window.html = window.html.join('');
+			win.send_to_editor(window.html);
+		});
+
+		/*jQuery.tp_insertProduct = {
 		
 			id : '',
 			feed : '',
 			name : '',
 		
 			insert : function(id, feed) {
-				var html = '';
 
-				html += '[tp_product id="'+id+'" feed="'+feed+'"]';
+				html += '[tp_product id="'+id+'" feed="'+feed+'"]  ';
 				
 				var win = window.dialogArguments || opener || parent || top;
-				win.send_to_editor(html);
+				//win.send_to_editor(html);
+
 				return false;
 			}
-		}
+		};*/
+
 		//]]>
 		</script>
 		<div id="tp_insert_filter">
@@ -117,11 +168,11 @@ do_action('admin_head');
 		<div id="tp_product_list_container"></div>
 <?php endif; ?>
 
-<?php /* ?>
+<?php  ?>
 <p class="savebutton tp-insert-product-submit wrap">
 <input type="button" class="button" id="tp_insert_product_submit" name="save" value="<?php esc_attr_e( 'Insert', 'tppi' ); ?>" onclick="tp_insertProduct.insert()" />
 </p>
-<?php //*/ ?>
+<?php // ?>
 
 </div>
 <?php

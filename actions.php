@@ -59,8 +59,8 @@ function tp_add_product_from_feed( $id, $feed, $category = array() ) {
 		tp_set_post_product_data( $ok, clone $pinfo );
 		tp_set_post_meta( $ok, $pinfo, ( $func == 'wp_update_post' ) );
 		
-		if( $func == 'wp_insert_post' && $pinfo->{'image-url'} )
-			tp_add_product_thumbnail($pinfo->{'image-url'}, $ok);
+		if( $func == 'wp_insert_post' && $pinfo->image_url )
+			tp_add_product_thumbnail($pinfo->image_url, $ok);
 		
 		return $ok;
 	} catch(Exception $e) {
@@ -83,7 +83,7 @@ function tp_add_product_thumbnail( $url, $post_id ) {
 	$wp_filetype = wp_check_filetype($filename, null );
 	$attachment = array(
 		'post_mime_type' => $wp_filetype['type'],
-//		'post_title' => preg_replace('/\.[^.]+$/', '', basename($filename)),
+	//		'post_title' => preg_replace('/\.[^.]+$/', '', basename($filename)),
 		'post_title' => get_the_title( $post_id ),
 		'post_content' => '',
 		'post_status' => 'inherit'
@@ -144,7 +144,7 @@ function tp_check_product_outdated( $product, $post = null ) {
 //	var_dump(get_post_meta( $post->ID, 'tp_product_data', true ), $s);
 //	var_dump($product->{'updated-at'}, $s->{'updated-at'}, $product->{'updated-at'} != $s->{'updated-at'});
 	
-	return ( $product->{'updated-at'} != $s->{'updated-at'} );
+	return ( $product->updated_at != $s->updated_at );
 	
 //	$errors = array();
 //	
@@ -165,8 +165,8 @@ function tp_check_product_outdated( $product, $post = null ) {
 //		}
 //		update_post_meta( $ok, 'tp_product_info', $vars );
 //		
-//		if( $func == 'wp_insert_post' && $pinfo->{'image-url'} )
-//			tp_add_product_thumbnail($pinfo->{'image-url'}, $ok);
+//		if( $func == 'wp_insert_post' && $pinfo->{'image_url'} )
+//			tp_add_product_thumbnail($pinfo->{'image_url'}, $ok);
 //		
 //		return $ok;
 //	} catch(Exception $e) {
@@ -178,7 +178,7 @@ function tp_check_product_outdated( $product, $post = null ) {
 
 function tp_decode_product_data( $data ) {
 	$data = base64_decode( $data );
-	if( ( unserialize( $data ) !== FALSE ) && ( is_object( unserialize( $data ) ) || is_array( unserialize( $data ) ) ) ) {
+	if( ( @unserialize( $data ) !== FALSE ) && ( is_object( unserialize( $data ) ) || is_array( unserialize( $data ) ) ) ) {
 		$data = unserialize( $data );
 		foreach( $data as $k => $v ) {
 			if( is_object($data) )

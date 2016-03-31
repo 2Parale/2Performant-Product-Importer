@@ -1,6 +1,7 @@
 (function($){
 	$(document).ready(function(){
 		$('#tp_update_product_info').click(function(e){
+			alert('test');
 			e.preventDefault();
 			
 			data = {
