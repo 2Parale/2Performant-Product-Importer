@@ -1,15 +1,37 @@
 (function($){
 	$.extend({
 		tpChosenProductId: 0,
-		tpChosenProductFeedId: 0,
+		tpChosenProductFeedId: 0
 	});
+	window.html = ''/*{}*/;
 	$.fn.extend({
 		tpProductClick: function(){
 			return $(this).each(function(){
 				$('#tp_product_' + $(this).tpplProductId() + '_button')
 					.unbind('click')
 					.click(function(){
-						$.tp_insertProduct.insert($(this).tpplProductWrapper().tpplProductId(), $(this).tpplProductWrapper().tpplProductFeedId());
+
+						if($(this).hasClass('inserted')) {
+							return false;
+						}
+
+						$(this).val('Inserted').addClass('inserted');
+
+						var id = $(this).tpplProductWrapper().tpplProductId();
+						var feed = $(this).tpplProductWrapper().tpplProductFeedId();
+
+						var append = '';
+						if($(this).parent().next().find('input[name="save_photo"]').is(':checked')) {
+							append += 'save_photo="true" ';
+						}
+						if($(this).parent().next().find('input[name="short_link"]').is(':checked')) {
+							append += 'short_link="true" ';
+						}
+						window.html += '[tp_product id="'+id+'" feed="'+feed+'" ' + append + '] <br /> <br />';
+
+						/*$.tp_insertProduct.insert(
+							$(this).tpplProductWrapper().tpplProductId(), 
+							$(this).tpplProductWrapper().tpplProductFeedId());*/
 					})
 				;
 			});
@@ -19,7 +41,9 @@
 	$(document).ready(function(){
 		
 		$('#tp_product_list_container').html($('<img />').attr('src', tpBaseUrl+'/img/loading.gif').css('display', 'block').css('margin','30px auto'));
-		
+
+
+
 		function productClick(a) {
 			return $(a).tpProductClick();
 		}

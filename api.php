@@ -5,18 +5,18 @@ include_once 'api/TPerformant.php';
 
 function tp_get_wrapper() {
 	global $tp;
-	
+
 	if ( ! isset( $tp ) ) {
 		$err = tp_verify_connection( $tp );
 		if( !empty($err) )
 			return false;
 	}
-	
+
 	return $tp;
 }
 
 function tp_verify_connection( &$tp = false ) {
-	
+
 	$connected = false;
 	$errors = array();
 	$connection = get_option( 'tp_options_connection' );
@@ -32,7 +32,7 @@ function tp_verify_connection( &$tp = false ) {
 				$errors[] = 'Invalid API URL';
 			} elseif ( is_object( $response ) ) {
 				$connected = true;
-				
+
 				if ( ! ( isset( $response->role ) && $response->role == 'affiliate' ) )
 					$errors[] = 'Logged in user is not an affiliate';
 			} else {
@@ -42,7 +42,7 @@ function tp_verify_connection( &$tp = false ) {
 				trigger_error( 'API response: ' . ob_get_contents(), E_USER_WARNING );
 				ob_end_clean();
 			}
-		} catch( TPException_Transport $e ){ 
+		} catch( TPException_Transport $e ){
 			$errors[] = 'Invalid username and password';
 		} catch( HTTP_Request2_Exception $e ) {
 			$errors[] = 'Invalid API URL';
@@ -65,33 +65,21 @@ function tp_feed_dropdown( $options = array() ) {
 	<option value="all">All</option>
 <?php
 	$tp = tp_get_wrapper();
-	$campaigns = ($tp->campaigns_listforaffiliate());
-	
-	// TODO: uncomment mai jos pentru categorii de campanii
-//	$categories = array();
-//	foreach ( $campaigns as $campaign ) {
-//		if ( ! isset( $categories[$campaign->category] ) )
-//			$categories[$campaign->{'category-id'}] = array();
-//		$categories[$campaign->{'category-id'}][] = $campaign;
-//	}
-//	usort($categories);
+	$campaigns = $tp->campaign_affiliate_feeds();
 
-	$categories = array($campaigns);
-	
-	foreach ( $categories as $category_name => $category ) :
-	usort( $category, 'compareByName' );
-	
-		foreach($category as $campaign) :
-			$feeds = fix_result($tp->product_stores_list($campaign->id));
+	usort($campaigns, 'compareByName');
 
-			if(!empty($feeds)) ?>
-				<option value="c_<?php echo $campaign->id; ?>" class="level-0"<?php echo $options['value'] == "c_{$campaign->id}" ? ' selected="selected"' : ''; ?>><?php echo htmlspecialchars($campaign->name); ?></option>
-			<?php
-			usort($feeds, 'compareById');
-			foreach($feeds as $feed) :?>
-				<option value="f_<?php echo $feed->id; ?>" class="level-1"<?php echo $options['value'] == "f_{$feed->id}" ? ' selected="selected"' : ''; ?>>&nbsp;&nbsp;&nbsp; <?php echo htmlspecialchars($feed->name); ?></option>
-<?php
-			endforeach;
+	foreach ($campaigns as $campaign):
+		//usort($campaign, 'compareByName');
+		//if(!empty($campaign)) ?>
+		<option value="c_<?php echo $campaign->id; ?>" class="level-0"<?php echo $options['value'] == "c_{$campaign->id}" ? ' selected="selected"' : ''; ?>><?php echo htmlspecialchars($campaign->name); ?></option>
+		<?php
+		$feeds = $campaign->product_stores;
+		usort($feeds, 'compareByName');
+
+		foreach($feeds as $feed) :?>
+			<option value="f_<?php echo $feed->id; ?>" class="level-1"<?php echo $options['value'] == "f_{$feed->id}" ? ' selected="selected"' : ''; ?>>&nbsp;&nbsp;&nbsp; <?php echo htmlspecialchars($feed->name); ?></option>
+		<?php
 		endforeach;
 	endforeach;
 ?>
@@ -106,35 +94,13 @@ function tp_campaign_dropdown( $options = array() ) {
 	<option><?php _e( 'Select a campaign', 'tppi' ); ?></option>
 <?php
 	$tp = tp_get_wrapper();
-	$campaigns = fix_result($tp->campaigns_listforaffiliate());
-	
-	// TODO: uncomment mai jos pentru categorii de campanii
-//	$categories = array();
-//	foreach ( $campaigns as $campaign ) {
-//		if ( ! isset( $categories[$campaign->category] ) )
-//			$categories[$campaign->{'category-id'}] = array();
-//		$categories[$campaign->{'category-id'}][] = $campaign;
-//	}
-//	ksort($categories);
+	$campaigns = $tp->campaign_affiliate_feeds();
 
-	$categories = array($campaigns);
-	foreach ( $categories as $category_name => $category ) :
-	usort( $category, 'compareByName' );
-	/*
-?>
-	<optgroup label="<?php echo $category_name; ?>">
-<?php
-	//*/	
-	foreach($category as $campaign) :
-?>
-			<option value="<?php echo $campaign->id; ?>" class="level-0"<?php echo $options['value'] == $campaign->id ? ' selected="selected"' : ''; ?>><?php echo htmlspecialchars($campaign->name); ?></option>
-<?php
-	endforeach;
-	/*
-?>
-	</optgroup>
-<?php
-	//*/
+	usort($campaigns, 'compareByName');
+
+	foreach ($campaigns as $campaign): ?>
+		<option value="c_<?php echo $campaign->id; ?>" class="level-0"<?php echo $options['value'] == "c_{$campaign->id}" ? ' selected="selected"' : ''; ?>><?php echo htmlspecialchars($campaign->name); ?></option>
+		<?php
 	endforeach;
 ?>
 </select>

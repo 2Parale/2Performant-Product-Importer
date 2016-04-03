@@ -10,7 +10,7 @@ function tp_edit_addbuttons() {
 	// Don't bother doing this stuff if the current user lacks permissions
 	if ( ! current_user_can( 'edit_posts' ) && ! current_user_can( 'edit_pages' ) )
 		return;
-	
+
 	// Add only in Rich Editor mode
 	if ( get_user_option( 'rich_editing' ) == 'true' ) {
 		add_filter( 'mce_external_plugins', 'tp_add_tinymce_plugin' );
@@ -23,12 +23,12 @@ add_action('admin_enqueue_scripts', 'tp_enqueue_script_edit_insert');
 function tp_enqueue_script_edit_insert() {
 	wp_enqueue_script( 'tp-insert-script' );
 }
- 
+
 function tp_register_insert_product_button( $buttons ) {
 	array_push( $buttons, 'separator', 'tp_insert_product' );
 	return $buttons;
 }
- 
+
 // Load the TinyMCE plugin : editor_plugin.js (wp2.5)
 function tp_add_tinymce_plugin( $plugin_array ) {
 	$plugin_array['tp_insert_product'] = WP_PLUGIN_URL . '/' . str_replace( basename(__FILE__), '', plugin_basename(__FILE__) ) . 'tinymce-insert/editor_plugin.js?v='.TPPI_VERSION;
@@ -40,11 +40,11 @@ function tp_add_tinymce_plugin( $plugin_array ) {
 add_action ( 'wp_ajax_tp_insertproduct_container', 'tp_ajax_insertproduct_container' );
 function tp_ajax_insertproduct_container() {
 	check_ajax_referer( 'tp_ajax_nonce' );
-	
+
 	$products = array();
 	$campaignID = 'approved';
 	$feedID = 'all';
-	
+
 	if(isset($_REQUEST['tp_insert_filter_feed'])) {
 		$selectFeed = $_REQUEST['tp_insert_filter_feed'];
 		if(strpos($_REQUEST['tp_insert_filter_feed'], 'c_') === 0) {
@@ -53,11 +53,11 @@ function tp_ajax_insertproduct_container() {
 			$feedID = substr($_REQUEST['tp_insert_filter_feed'], 2);
 		}
 	}
-	
+
 	$search = isset($_REQUEST['s']) ? $_REQUEST['s'] : '';
 	$page = isset($_REQUEST['tp_insert_page']) ? $_REQUEST['tp_insert_page'] : 1;
 	$pt = tp_get_post_type();
-	
+
 	$tp = tp_get_wrapper();
 	$perpage = 24;
 	$sort = 'date';
@@ -68,7 +68,7 @@ function tp_ajax_insertproduct_container() {
 ?>
 	<ul class="tp-product-list clear">
 <?php foreach($products as $product) : ?>
-<?php 
+<?php
 	$t = get_posts( (( $pt == 'post') ? '' : "post_type={$pt}&") . "meta_key=tp_product_ID&meta_value={$product->id}&post_status=publish,draft,trash");
 	$pr = empty($t) ? null : array_pop($t);
 	$pid = $pr ? $pr->ID : 0;
@@ -77,19 +77,24 @@ function tp_ajax_insertproduct_container() {
 ?>
 	<li class="tp-product-list-entry<?php echo !($i = ++$i % 4) ? " clear" : ''; ?>">
 		<p class="tp-product-image product-<?php echo $product->id; ?>">
-			<a href="<?php echo $product->url; ?>" target="_blank"><img src="<?php echo $product->{'image-url'}; ?>" title="<?php echo $product->title; ?>" class="tp-product-thumbnail" /></a>
+			<a href="<?php echo $product->url; ?>" target="_blank"><img src="<?php echo $product->image_url; ?>" title="<?php echo $product->title; ?>" class="tp-product-thumbnail" /></a>
 			<br/>
 			<a href="<?php echo $product->url; ?>" target="_blank"><small><?php _e('Click for details', 'tppi'); ?></small></a>
 		</p>
 		<p><span class="tp-product-title product-<?php echo $product->id; ?>"><strong><?php echo $product->brand; ?></strong> <?php echo $product->title; ?></span></p>
 		<p><span class="tp-product-price product-<?php echo $product->id; ?>"><?php echo $product->price; ?></span></p>
-		
+
 		<input type="hidden" id="tp_product_<?php echo $product->id; ?>_id" class="tp-product-id" value="<?php echo $product->id; ?>" />
-		<input type="hidden" id="tp_product_<?php echo $product->id; ?>_feed_id" class="tp-product-feed-id" value="<?php echo $product->{'product-store-id'}; ?>" />
-		
+		<input type="hidden" id="tp_product_<?php echo $product->id; ?>_feed_id" class="tp-product-feed-id" value="<?php echo $product->product_store_id; ?>" />
+
 		<p class="tp-action-row submitbox">
 			<input type="button" id="tp_product_<?php echo $product->id; ?>_button" class="button-secondary tp-product-action-button product-<?php echo $product->id; ?>" value="<?php _e( 'Insert', 'tppi' ); ?>" />
 		</p>
+		<p>
+			<label><input type="checkbox" name="save_photo" checked> Save photo</label>
+			<label><input type="checkbox" name="short_link" checked> Short link</label>
+		</p>
+		<p style="font-size: 10px;">[tp_product id="<?php echo $product->id; ?>" feed="<?php echo $product->product_store_id; ?>"]  </p>
 	</li>
 <?php endforeach; ?>
 	</ul>

@@ -1,11 +1,16 @@
 Changelog
 =========
+* Mon Apr 7 10:00:00 EST 2014 - Alexandru - Emil Lupu <alexandru.lupu@2parale.ro>
+  - added campaign_affiliate_feeds method to api calls
+  - indentation fix
+  - tagged v0.6.2
+
 * Mon Mar 18 14:19:22 EST 2013 - Tudor Sandu <tudor.sandu@2parale.ro>
   - modified campaigns_listforaffiliate method according to API server changes
   - tagged v0.6.1
 
 * Sun Mar 17 14:09:50 EST 2013 - Alex Lupu <alexandru.lupu@2parale.ro>
-  - fixed Authentication error when using multiple pages 
+  - fixed Authentication error when using multiple pages
 
 * Tue Mar 12 13:21:43 EST 2013 - Tudor Sandu <tudor.sandu@2parale.ro>
   - 0.6 release
@@ -121,7 +126,7 @@ Changelog
     Thanks to Valentin Agachi for the patch.
   - Added a new option to _search called sort.
   - Added a new option to WidgetStores list/search called uniq_products.
-    It makes sure the campaign prid pair is unique so it only returns 
+    It makes sure the campaign prid pair is unique so it only returns
     uniq products.
 
 * Fri Feb 27 19:58:50 EET 2009 - Radu Spineanu <radu@2performant.com>

@@ -56,6 +56,48 @@ function tp_register_settings() {
 				)
 			)
 		),
+
+
+
+		'image_options' => array(
+			'label' => 'Image options options',
+			'settings' => array(
+				'image_name' => array(
+					'type' => 'text',
+					'label' => 'Set the image name',
+					'description' => 'You can use keywords: %title% %brand% %category% %subcategory% %price% %description% %id_product% ',
+					'default' => '%title%-%brand%'
+				),
+				'max_image_width' => array(
+					'type' => 'text',
+					'label' => 'Set the max image width',
+					'description' => 'Ex: 600 (px)',
+					'default' => '600'
+				),
+				'max_image_height' => array(
+					'type' => 'text',
+					'label' => 'Set the max image height',
+					'description' => 'Ex: 600 (px)',
+					'default' => '600'
+				)
+			)
+		),
+
+		'bitly_options' => array(
+			'label' => 'Bit.ly API options',
+			'settings' => array(
+				'login' => array(
+					'type' => 'text',
+					'label' => 'Set the login'
+				),
+				'api_key' => array(
+					'type' => 'text',
+					'label' => 'Set the API KEY'
+				)
+			)
+		),
+
+
 		'fields' => array(
 			'label' => 'Metadata to get when mass-importing',
 			'settings' => array(
@@ -80,7 +122,7 @@ function tp_register_settings() {
 					'default' => '<div class="tp-product-info">
 	<div class="tp-product-thumbnail">
 		<a href="%aff_link%">
-			<img src="%image-url%" />
+			<img src="%image_url%" />
 		</a>
 	</div>
 	<div class="tp-product-meta">
@@ -206,7 +248,7 @@ $field_names = array(
 	'description',
 	'prid',
 	'active',
-	'image-url',
+	'image_url',
 	'image_urls',
 	'aff_link'
 );
