@@ -10,17 +10,15 @@
 				$('#tp_product_' + $(this).tpplProductId() + '_button')
 					.unbind('click')
 					.click(function(){
+
+						if($(this).hasClass('inserted')) {
+							return false;
+						}
+
 						$(this).val('Inserted').addClass('inserted');
 
 						var id = $(this).tpplProductWrapper().tpplProductId();
 						var feed = $(this).tpplProductWrapper().tpplProductFeedId();
-
-						var key = id + '_' + feed;
-
-						/*if($(this).val() == 'Inserted') {
-
-							window.html.splice()
-						}*/
 
 						var append = '';
 						if($(this).parent().next().find('input[name="save_photo"]').is(':checked')) {
@@ -29,7 +27,7 @@
 						if($(this).parent().next().find('input[name="short_link"]').is(':checked')) {
 							append += 'short_link="true" ';
 						}
-						window.html/*[key]*/ += '[tp_product id="'+id+'" feed="'+feed+'" ' + append + '] <br /> <br />';
+						window.html += '[tp_product id="'+id+'" feed="'+feed+'" ' + append + '] <br /> <br />';
 
 						/*$.tp_insertProduct.insert(
 							$(this).tpplProductWrapper().tpplProductId(), 
